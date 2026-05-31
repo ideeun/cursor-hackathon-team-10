@@ -15,8 +15,8 @@ export default function MainLayout({
 
   if (loading) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50/30 to-sky-50">
-        <Loader2 size={32} className="animate-spin text-orange-500" />
+      <div className="sf-page flex min-h-dvh items-center justify-center">
+        <Loader2 size={32} className="animate-spin text-peach-muted" />
       </div>
     );
   }

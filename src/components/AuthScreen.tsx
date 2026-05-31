@@ -79,18 +79,21 @@ export default function AuthScreen() {
     }
   };
 
+  const authInput =
+    "sf-input w-full py-3 pl-10 pr-4 text-sm";
+
   return (
-    <div className="flex min-h-dvh items-center justify-center px-4 py-8 lg:px-8">
-      <div className="mx-auto flex w-full max-w-md flex-col justify-center bg-gradient-to-b from-orange-50 via-amber-50/30 to-sky-50 px-6 py-10 shadow-2xl lg:max-w-5xl lg:flex-row lg:overflow-hidden lg:rounded-3xl lg:border lg:border-orange-100 lg:p-0">
-        <div className="mb-8 text-center lg:mb-0 lg:flex lg:w-[42%] lg:flex-col lg:justify-center lg:bg-gradient-to-br lg:from-orange-500 lg:to-amber-500 lg:px-10 lg:py-14 lg:text-left">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-orange-400 to-amber-500 shadow-xl lg:mx-0 lg:h-20 lg:w-20 lg:bg-white/20">
-            <Sun size={32} className="text-white lg:h-10 lg:w-10" />
+    <div className="sf-page flex min-h-dvh items-center justify-center px-4 py-8 lg:px-8">
+      <div className="mx-auto flex w-full max-w-md flex-col justify-center px-6 py-10 lg:max-w-5xl lg:flex-row lg:overflow-hidden lg:rounded-2xl lg:border lg:border-sand/80 lg:bg-surface lg:p-0 lg:shadow-[0_8px_40px_rgb(92_86_80/6%)]">
+        <div className="mb-8 text-center lg:mb-0 lg:flex lg:w-[42%] lg:flex-col lg:justify-center lg:bg-gradient-to-br lg:from-orange-400 lg:to-orange-500 lg:px-10 lg:py-14 lg:text-left">
+          <div className="sf-avatar mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl lg:mx-0 lg:h-20 lg:w-20 lg:bg-white/20 lg:shadow-none lg:[background-image:none]">
+            <Sun size={32} strokeWidth={1.75} className="lg:h-10 lg:w-10" />
           </div>
-          <h1 className="text-2xl font-black text-stone-800 lg:text-3xl lg:text-white">
+          <h1 className="text-2xl font-semibold text-ink lg:text-3xl lg:text-white">
             SummerFlow
           </h1>
-          <p className="mt-1 text-sm text-stone-500 lg:mt-3 lg:text-base lg:text-orange-50">
-            Лето без скуки — активности, челленджи и сборы
+          <p className="mt-1 text-sm text-ink-light lg:mt-3 lg:text-base lg:text-orange-50">
+            Лето без скуки — ивенты, челленджи и сборы
           </p>
           <p className="mt-6 hidden text-sm leading-relaxed text-orange-100 lg:block">
             Ивенты в Кыргызстане, летние челленджи и сборы компании — в одном
@@ -98,18 +101,18 @@ export default function AuthScreen() {
           </p>
         </div>
 
-        <div className="rounded-3xl border border-orange-100 bg-white p-6 shadow-lg lg:flex-1 lg:rounded-none lg:border-0 lg:shadow-none lg:p-10">
-        <div className="mb-5 flex rounded-2xl bg-stone-100 p-1">
+        <div className="sf-card rounded-2xl p-6 lg:flex-1 lg:rounded-none lg:border-0 lg:shadow-none lg:p-10">
+        <div className="mb-5 flex rounded-xl bg-stone-100 p-1">
           <button
             type="button"
             onClick={() => {
               setMode("login");
               setError("");
             }}
-            className={`flex-1 rounded-xl py-2 text-sm font-bold transition-all duration-300 ${
+            className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all duration-200 ${
               mode === "login"
-                ? "bg-white text-orange-600 shadow"
-                : "text-stone-500"
+                ? "bg-surface text-peach-deep shadow-sm"
+                : "text-ink-light"
             }`}
           >
             Вход
@@ -120,10 +123,10 @@ export default function AuthScreen() {
               setMode("register");
               setError("");
             }}
-            className={`flex-1 rounded-xl py-2 text-sm font-bold transition-all duration-300 ${
+            className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all duration-200 ${
               mode === "register"
-                ? "bg-white text-orange-600 shadow"
-                : "text-stone-500"
+                ? "bg-surface text-peach-deep shadow-sm"
+                : "text-ink-light"
             }`}
           >
             Регистрация
@@ -135,21 +138,21 @@ export default function AuthScreen() {
             <div className="relative">
               <User
                 size={16}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-faint"
               />
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Ваше имя"
-                className="w-full rounded-2xl border border-stone-200 bg-stone-50 py-3 pl-10 pr-4 text-sm outline-none transition-all focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                className={authInput}
               />
             </div>
           )}
           <div className="relative">
             <Mail
               size={16}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-faint"
             />
             <input
               type="email"
@@ -157,13 +160,13 @@ export default function AuthScreen() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
               required
-              className="w-full rounded-2xl border border-stone-200 bg-stone-50 py-3 pl-10 pr-4 text-sm outline-none transition-all focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+              className={authInput}
             />
           </div>
           <div className="relative">
             <Lock
               size={16}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-faint"
             />
             <input
               type="password"
@@ -172,20 +175,18 @@ export default function AuthScreen() {
               placeholder="Пароль (мин. 6 символов)"
               required
               minLength={6}
-              className="w-full rounded-2xl border border-stone-200 bg-stone-50 py-3 pl-10 pr-4 text-sm outline-none transition-all focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+              className={authInput}
             />
           </div>
 
           {error && (
-            <p className="rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600">
-              {error}
-            </p>
+            <p className="sf-error px-3 py-2 text-xs">{error}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 py-3 text-sm font-bold text-white shadow-lg transition-all duration-300 hover:shadow-xl active:scale-[0.98] disabled:opacity-70"
+            className="sf-btn-primary flex w-full items-center justify-center gap-2 py-3 text-sm disabled:opacity-70"
           >
             {loading ? (
               <Loader2 size={18} className="animate-spin" />
@@ -199,9 +200,9 @@ export default function AuthScreen() {
         </form>
 
         <div className="my-5 flex items-center gap-3">
-          <div className="h-px flex-1 bg-stone-200" />
-          <span className="text-xs text-stone-400">или</span>
-          <div className="h-px flex-1 bg-stone-200" />
+          <div className="h-px flex-1 bg-sand" />
+          <span className="text-xs text-ink-faint">или</span>
+          <div className="h-px flex-1 bg-sand" />
         </div>
 
         <div className="space-y-2">
@@ -209,7 +210,7 @@ export default function AuthScreen() {
             type="button"
             onClick={handleGoogle}
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-white py-3 text-sm font-semibold text-stone-700 transition-all duration-300 hover:bg-stone-50 active:scale-[0.98] disabled:opacity-70"
+            className="sf-btn-ghost flex w-full items-center justify-center gap-2 py-3 text-sm disabled:opacity-70"
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
               <path
@@ -236,14 +237,14 @@ export default function AuthScreen() {
             type="button"
             onClick={handleAnonymous}
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-sky-500 to-emerald-500 py-3 text-sm font-bold text-white shadow-md transition-all duration-300 hover:shadow-lg active:scale-[0.98] disabled:opacity-70"
+            className="sf-btn-soft flex w-full items-center justify-center gap-2 py-3 text-sm disabled:opacity-70"
           >
             <Sparkles size={16} />
             Быстрый вход (гость)
           </button>
         </div>
 
-          <p className="mt-6 text-center text-[10px] text-stone-400">
+          <p className="mt-6 text-center text-[10px] text-ink-faint">
             Для демо на хакатоне — используйте «Быстрый вход» или Google
           </p>
         </div>

@@ -10,23 +10,23 @@ export default function GatheringsPage() {
     useAppData();
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-4">
       <div className="flex items-center justify-between lg:justify-end">
         <div className="flex items-center gap-2 lg:hidden">
-          <Users size={18} className="text-sky-500" />
-          <h2 className="text-base font-bold text-stone-800">Сборы и встречи</h2>
+          <Users size={18} className="text-peach-muted" strokeWidth={1.75} />
+          <h2 className="text-base font-semibold text-ink">Сборы и встречи</h2>
         </div>
         <button
           onClick={() => openGatheringModal()}
-          className="rounded-xl bg-sky-500 px-3 py-1.5 text-xs font-bold text-white transition-all hover:bg-sky-600"
+          className="sf-btn-primary px-4 py-2 text-xs"
         >
           + Создать
         </button>
       </div>
 
       {gatherings.length === 0 && (
-        <p className="rounded-2xl bg-white p-4 text-center text-sm text-stone-500 shadow-sm">
-          Сборов пока нет. Нажмите «+» чтобы объявить встречу.
+        <p className="sf-card px-4 py-8 text-center text-sm text-ink-light">
+          Сборов пока нет. Нажмите «+», чтобы объявить встречу.
         </p>
       )}
 
@@ -34,19 +34,17 @@ export default function GatheringsPage() {
         {gatherings.map((gathering) => (
           <div
             key={gathering.id}
-            className={`rounded-3xl border p-4 shadow-md transition-all duration-300 hover:scale-[1.01] hover:shadow-lg ${
-              gathering.is_secret
-                ? "secret-card border-transparent bg-gradient-to-br from-amber-50 to-orange-50"
-                : "border-sky-100 bg-white"
+            className={`sf-card sf-card-hover p-4 ${
+              gathering.is_secret ? "secret-card" : ""
             }`}
           >
             <div className="mb-2 flex items-start gap-3">
               <span className="text-3xl">{gathering.emoji}</span>
               <div className="flex-1">
-                <h3 className="font-bold text-stone-800">{gathering.title}</h3>
-                <p className="mt-0.5 text-xs text-stone-500">
+                <h3 className="font-medium text-ink">{gathering.title}</h3>
+                <p className="mt-0.5 text-xs text-ink-light">
                   Организатор:{" "}
-                  <span className="font-semibold text-sky-600">
+                  <span className="font-medium text-peach-deep">
                     {gathering.host_name}
                   </span>
                 </p>
@@ -54,14 +52,14 @@ export default function GatheringsPage() {
             </div>
 
             {gathering.description && (
-              <p className="mb-3 text-xs leading-relaxed text-stone-500">
+              <p className="mb-3 text-xs leading-relaxed text-ink-light">
                 {gathering.description}
               </p>
             )}
 
             {gathering.is_secret && gathering.hidden_location && (
-              <div className="mb-3 flex items-center gap-2 rounded-2xl bg-amber-100/80 px-3 py-2 text-xs font-semibold text-amber-800">
-                <MapPinned size={13} />
+              <div className="mb-3 flex items-center gap-2 rounded-xl bg-peach-soft px-3 py-2 text-xs font-medium text-peach-deep">
+                <MapPinned size={13} strokeWidth={1.75} />
                 {gathering.isJoined
                   ? SECRET_EVENT.revealedLocation
                   : gathering.hidden_location}
@@ -75,11 +73,11 @@ export default function GatheringsPage() {
             )}
 
             <div className="mb-3 flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full bg-amber-50 px-2.5 py-1 font-medium text-amber-700">
-                📅 {gathering.date_time}
+              <span className="sf-badge px-2.5 py-1 normal-case tracking-normal">
+                {gathering.date_time}
               </span>
-              <span className="rounded-full bg-sky-50 px-2.5 py-1 font-medium text-sky-700">
-                👥 Мест: {gathering.spots_left}
+              <span className="sf-badge px-2.5 py-1 normal-case tracking-normal">
+                Мест: {gathering.spots_left}
               </span>
             </div>
 
@@ -92,20 +90,20 @@ export default function GatheringsPage() {
                 gathering.spots_left <= 0 ||
                 actionLoading === gathering.id
               }
-              className={`w-full rounded-2xl py-2.5 text-sm font-bold transition-all duration-300 active:scale-95 ${
+              className={`w-full rounded-xl py-2.5 text-sm font-medium transition-all duration-200 ${
                 gathering.isJoined
-                  ? "cursor-default bg-emerald-100 text-emerald-700"
+                  ? "cursor-default bg-peach-soft text-peach-deep"
                   : gathering.spots_left <= 0
-                    ? "cursor-not-allowed bg-stone-100 text-stone-400"
+                    ? "cursor-not-allowed bg-stone-100 text-ink-faint"
                     : gathering.is_secret
-                      ? "bg-gradient-to-r from-amber-500 via-red-500 to-yellow-500 text-white shadow-md hover:shadow-lg"
-                      : "bg-gradient-to-r from-sky-500 to-emerald-500 text-white shadow-md hover:shadow-lg"
+                      ? "sf-btn-primary"
+                      : "sf-btn-soft"
               }`}
             >
               {actionLoading === gathering.id ? (
                 <Loader2 size={16} className="mx-auto animate-spin" />
               ) : gathering.isJoined ? (
-                "Вы идёте! ✅"
+                "Вы идёте"
               ) : gathering.spots_left <= 0 ? (
                 "Мест нет"
               ) : (

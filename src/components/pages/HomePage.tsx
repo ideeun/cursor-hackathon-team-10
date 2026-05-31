@@ -43,14 +43,14 @@ export default function HomePage() {
   const visible = filterKgEvents(events, showFree);
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-4">
       <div className="lg:hidden">
-        <h2 className="text-base font-bold text-stone-800">
+        <h2 className="text-base font-semibold text-ink">
           Ивенты в Кыргызстане
         </h2>
-        <p className="text-xs text-stone-500">Бесплатные и платные</p>
+        <p className="text-xs text-ink-light">Бесплатные и платные</p>
       </div>
-      <p className="hidden text-sm text-stone-500 lg:block">
+      <p className="hidden text-sm text-ink-light lg:block">
         Бесплатные и платные ивенты по всей стране
       </p>
 
@@ -59,26 +59,24 @@ export default function HomePage() {
           setShowFree((v) => !v);
           setExpandedId(null);
         }}
-        className="relative flex h-10 w-full max-w-xs items-center rounded-full bg-gradient-to-r from-emerald-100 to-orange-100 p-1 shadow-inner lg:max-w-sm"
+        className="relative flex h-10 w-full max-w-xs items-center rounded-full bg-stone-100 p-1 lg:max-w-sm"
         aria-label="Бесплатные или платные"
       >
         <span
-          className={`absolute h-8 w-[calc(50%-4px)] rounded-full shadow-lg transition-all duration-300 ease-out ${
-            showFree
-              ? "left-1 bg-gradient-to-r from-emerald-500 to-emerald-400"
-              : "left-[calc(50%+2px)] bg-gradient-to-r from-orange-500 to-amber-400"
+          className={`absolute h-8 w-[calc(50%-4px)] rounded-full bg-peach-muted transition-all duration-300 ease-out ${
+            showFree ? "left-1" : "left-[calc(50%+2px)]"
           }`}
         />
         <span
-          className={`relative z-10 flex-1 text-center text-xs font-bold transition-colors ${
-            showFree ? "text-white" : "text-stone-500"
+          className={`relative z-10 flex-1 text-center text-xs font-medium transition-colors ${
+            showFree ? "text-white" : "text-ink-light"
           }`}
         >
           Бесплатные
         </span>
         <span
-          className={`relative z-10 flex-1 text-center text-xs font-bold transition-colors ${
-            !showFree ? "text-white" : "text-stone-500"
+          className={`relative z-10 flex-1 text-center text-xs font-medium transition-colors ${
+            !showFree ? "text-white" : "text-ink-light"
           }`}
         >
           Платные
@@ -86,61 +84,53 @@ export default function HomePage() {
       </button>
 
       {loading && (
-        <div className="flex items-center justify-center gap-2 py-8 text-sm text-stone-500">
-          <Loader2 size={18} className="animate-spin text-orange-500" />
+        <div className="flex items-center justify-center gap-2 py-10 text-sm text-ink-light">
+          <Loader2 size={18} className="animate-spin text-peach-muted" />
           Загружаем ивенты...
         </div>
       )}
 
       {!loading && visible.length === 0 && (
-        <p className="rounded-2xl bg-white/80 px-4 py-6 text-center text-sm text-stone-500">
+        <p className="sf-card px-4 py-8 text-center text-sm text-ink-light">
           Пока нет {showFree ? "бесплатных" : "платных"} ивентов
         </p>
       )}
 
       {!loading && (
-        <ul className="space-y-2 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0 xl:grid-cols-3">
+        <ul className="space-y-2.5 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0 xl:grid-cols-3">
           {visible.map((event) => {
             const open = expandedId === event.id;
             return (
               <li key={event.id}>
                 <button
                   type="button"
-                  onClick={() =>
-                    setExpandedId(open ? null : event.id)
-                  }
-                  className="w-full rounded-2xl border border-orange-100 bg-white p-3.5 text-left shadow-sm transition-shadow hover:shadow-md"
+                  onClick={() => setExpandedId(open ? null : event.id)}
+                  className="sf-card sf-card-hover w-full p-4 text-left"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <span className="font-semibold text-stone-800">
-                      {event.title}
-                    </span>
-                    <span className="shrink-0 rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-bold uppercase text-orange-600">
+                    <span className="font-medium text-ink">{event.title}</span>
+                    <span className="sf-badge shrink-0 px-2 py-0.5">
                       {EVENT_TYPE_LABELS[event.type]}
                     </span>
                   </div>
-                  <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500">
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-light">
                     <span className="inline-flex items-center gap-1">
-                      <Calendar size={12} className="text-sky-500" />
+                      <Calendar size={12} className="text-peach-muted" />
                       {formatEventDate(event.date)}
                     </span>
                     <span className="inline-flex items-center gap-1">
-                      <MapPin size={12} className="text-emerald-500" />
+                      <MapPin size={12} className="text-peach-muted" />
                       {event.location}
                     </span>
-                    <span
-                      className={`inline-flex items-center gap-1 font-semibold ${
-                        event.isFree ? "text-emerald-600" : "text-orange-600"
-                      }`}
-                    >
-                      <Ticket size={12} />
+                    <span className="inline-flex items-center gap-1 font-medium text-peach-deep">
+                      <Ticket size={12} className="text-peach-muted" />
                       {event.isFree ? "Бесплатно" : event.price}
                     </span>
                   </div>
                 </button>
 
                 {open && (
-                  <div className="mt-1 flex gap-2 rounded-2xl border border-orange-50 bg-orange-50/50 p-2">
+                  <div className="mt-1.5 flex gap-2 rounded-xl bg-stone-50 p-2">
                     <button
                       onClick={async () => {
                         try {
@@ -154,13 +144,10 @@ export default function HomePage() {
                         }
                       }}
                       disabled={actionLoading === "add-challenge"}
-                      className="flex-1 rounded-xl bg-emerald-500 py-2 text-[11px] font-bold text-white disabled:opacity-70"
+                      className="sf-btn-primary flex-1 py-2 text-[11px] disabled:opacity-70"
                     >
                       {actionLoading === "add-challenge" ? (
-                        <Loader2
-                          size={12}
-                          className="mx-auto animate-spin"
-                        />
+                        <Loader2 size={12} className="mx-auto animate-spin" />
                       ) : (
                         "В челленджи"
                       )}
@@ -173,7 +160,7 @@ export default function HomePage() {
                         );
                         router.push("/gatherings");
                       }}
-                      className="flex-1 rounded-xl bg-sky-500 py-2 text-[11px] font-bold text-white"
+                      className="sf-btn-soft flex-1 py-2 text-[11px]"
                     >
                       Собрать компанию
                     </button>
@@ -186,9 +173,7 @@ export default function HomePage() {
       )}
 
       {actionError && (
-        <p className="rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600">
-          {actionError}
-        </p>
+        <p className="sf-error px-3 py-2 text-xs">{actionError}</p>
       )}
     </section>
   );

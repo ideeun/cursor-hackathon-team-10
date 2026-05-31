@@ -1,3 +1,5 @@
+"use client";
+
 export default function ProgressBar({
   current,
   target,
@@ -6,20 +8,22 @@ export default function ProgressBar({
   target: number;
 }) {
   const pct = Math.min(100, Math.round((current / target) * 100));
+
   return (
-    <div className="space-y-1.5">
-      <div className="flex justify-between text-xs text-stone-500">
-        <span>
-          {current.toLocaleString("ru-RU")} / {target.toLocaleString("ru-RU")}
-        </span>
-        <span className="font-semibold text-emerald-600">{pct}%</span>
+    <div>
+      <div className="mb-1.5 flex justify-between text-xs text-ink-light">
+        <span>{current.toLocaleString()}</span>
+        <span>{target.toLocaleString()}</span>
       </div>
-      <div className="h-2.5 overflow-hidden rounded-full bg-emerald-100">
+      <div className="h-2 overflow-hidden rounded-full bg-stone-100">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-600 transition-all duration-500"
+          className="h-full rounded-full bg-gradient-to-r from-orange-400 to-orange-500 transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>
+      <p className="mt-1 text-right text-[10px] font-medium text-peach-deep">
+        {pct}%
+      </p>
     </div>
   );
 }

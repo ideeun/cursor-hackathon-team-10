@@ -9,25 +9,23 @@ export default function ChallengesPage() {
     useAppData();
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-4">
       <div className="flex items-center justify-between lg:justify-end">
         <div className="flex items-center gap-2 lg:hidden">
-          <Trophy size={18} className="text-emerald-500" />
-          <h2 className="text-base font-bold text-stone-800">
-            Летние челленджи
-          </h2>
+          <Trophy size={18} className="text-peach-muted" strokeWidth={1.75} />
+          <h2 className="text-base font-semibold text-ink">Летние челленджи</h2>
         </div>
         <button
           onClick={() => openChallengeModal()}
-          className="rounded-xl bg-emerald-500 px-3 py-1.5 text-xs font-bold text-white transition-all hover:bg-emerald-600"
+          className="sf-btn-primary px-4 py-2 text-xs"
         >
           + Создать
         </button>
       </div>
 
       {challenges.length === 0 && (
-        <p className="rounded-2xl bg-white p-4 text-center text-sm text-stone-500 shadow-sm">
-          Челленджей пока нет. Нажмите «+» или добавьте активность с главной.
+        <p className="sf-card px-4 py-8 text-center text-sm text-ink-light">
+          Челленджей пока нет. Нажмите «+» или добавьте ивент с главной.
         </p>
       )}
 
@@ -35,13 +33,11 @@ export default function ChallengesPage() {
         {challenges.map((challenge) => (
           <div
             key={challenge.id}
-            className="w-72 shrink-0 snap-start rounded-3xl border border-emerald-100 bg-white p-4 shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-lg lg:w-auto"
+            className="sf-card sf-card-hover w-72 shrink-0 snap-start p-4 lg:w-auto"
           >
             <div className="mb-3 flex items-center gap-2">
               <span className="text-2xl">{challenge.emoji}</span>
-              <h3 className="text-sm font-bold text-stone-800">
-                {challenge.title}
-              </h3>
+              <h3 className="text-sm font-medium text-ink">{challenge.title}</h3>
             </div>
 
             {challenge.type === "progress" && (
@@ -53,13 +49,13 @@ export default function ChallengesPage() {
 
             {challenge.type === "leaderboard" && challenge.leaderboard && (
               <div className="space-y-2">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-ink-faint">
                   Лидерборд
                 </p>
                 {challenge.leaderboard.map((entry) => (
                   <div
                     key={entry.name}
-                    className="flex items-center justify-between rounded-xl bg-stone-50 px-2.5 py-1.5 text-xs text-stone-600"
+                    className="flex items-center justify-between rounded-lg bg-stone-50 px-2.5 py-1.5 text-xs text-ink-light"
                   >
                     <span>
                       #{entry.rank} {entry.name}
@@ -71,10 +67,10 @@ export default function ChallengesPage() {
             )}
 
             {challenge.type === "status" && challenge.status === "completed" && (
-              <div className="flex items-center gap-2 rounded-2xl bg-emerald-50 px-3 py-2.5">
-                <span className="text-lg">✅</span>
-                <span className="text-sm font-bold text-emerald-700">
-                  Выполнено!
+              <div className="flex items-center gap-2 rounded-xl bg-peach-soft px-3 py-2.5">
+                <span className="text-lg">✓</span>
+                <span className="text-sm font-medium text-peach-deep">
+                  Выполнено
                 </span>
               </div>
             )}
@@ -83,7 +79,7 @@ export default function ChallengesPage() {
               <button
                 onClick={() => handleJoinChallenge(challenge.id)}
                 disabled={actionLoading === challenge.id}
-                className="mt-3 w-full rounded-2xl bg-gradient-to-r from-orange-400 to-amber-500 py-2 text-xs font-bold text-white shadow transition-all duration-300 hover:shadow-md active:scale-95 disabled:opacity-70"
+                className="sf-btn-primary mt-3 w-full py-2 text-xs disabled:opacity-70"
               >
                 {actionLoading === challenge.id ? (
                   <Loader2 size={14} className="mx-auto animate-spin" />
@@ -94,7 +90,7 @@ export default function ChallengesPage() {
             )}
 
             {challenge.isParticipant && challenge.status !== "completed" && (
-              <div className="mt-3 flex items-center justify-center gap-1.5 rounded-2xl bg-amber-50 py-2 text-xs font-bold text-amber-700">
+              <div className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-peach-soft py-2 text-xs font-medium text-peach-deep">
                 <Loader2 size={12} className="animate-spin" />
                 Вы участвуете
               </div>

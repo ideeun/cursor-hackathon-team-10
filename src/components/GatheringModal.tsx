@@ -3,6 +3,8 @@
 import { Loader2, X } from "lucide-react";
 import { useAppData } from "@/contexts/AppDataContext";
 
+const inputClass = "sf-input w-full px-4 py-3 text-sm";
+
 export default function GatheringModal() {
   const {
     showModal,
@@ -23,20 +25,20 @@ export default function GatheringModal() {
   if (!showModal) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm lg:items-center lg:p-6">
-      <div className="w-full max-w-md animate-in rounded-t-3xl bg-white p-6 shadow-2xl lg:max-w-lg lg:rounded-3xl">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-stone-900/20 backdrop-blur-sm lg:items-center lg:p-6">
+      <div className="sf-card w-full max-w-md animate-in rounded-t-2xl p-6 lg:max-w-lg lg:rounded-2xl">
         <div className="mb-5 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-stone-800">Объявить сбор ✨</h3>
+          <h3 className="text-lg font-semibold text-ink">Объявить сбор</h3>
           <button
             onClick={() => setShowModal(false)}
-            className="rounded-full bg-stone-100 p-2 text-stone-500 transition-colors hover:bg-stone-200"
+            className="rounded-full bg-stone-100 p-2 text-ink-light transition-colors hover:bg-orange-50"
           >
             <X size={18} />
           </button>
         </div>
         <form onSubmit={handleCreateGathering} className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-stone-500">
+            <label className="mb-1.5 block text-xs font-medium text-ink-light">
               Название
             </label>
             <input
@@ -44,12 +46,12 @@ export default function GatheringModal() {
               value={formTitle}
               onChange={(e) => setFormTitle(e.target.value)}
               placeholder="Например: Поход на водопад"
-              className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition-all focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+              className={inputClass}
               required
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-stone-500">
+            <label className="mb-1.5 block text-xs font-medium text-ink-light">
               Описание
             </label>
             <textarea
@@ -57,17 +59,17 @@ export default function GatheringModal() {
               onChange={(e) => setFormDescription(e.target.value)}
               placeholder="Расскажи подробнее..."
               rows={3}
-              className="w-full resize-none rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition-all focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+              className={`${inputClass} resize-none`}
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-stone-500">
+            <label className="mb-1.5 block text-xs font-medium text-ink-light">
               Категория
             </label>
             <select
               value={formCategory}
               onChange={(e) => setFormCategory(e.target.value)}
-              className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition-all focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+              className={inputClass}
             >
               <option value="sport">Спорт</option>
               <option value="camp">Лагерь / Поход</option>
@@ -76,7 +78,7 @@ export default function GatheringModal() {
             </select>
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-stone-500">
+            <label className="mb-1.5 block text-xs font-medium text-ink-light">
               Макс. участников
             </label>
             <input
@@ -85,23 +87,21 @@ export default function GatheringModal() {
               max={50}
               value={formMaxSpots}
               onChange={(e) => setFormMaxSpots(Number(e.target.value))}
-              className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition-all focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+              className={inputClass}
             />
           </div>
           {actionError && (
-            <p className="rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600">
-              {actionError}
-            </p>
+            <p className="sf-error px-3 py-2 text-xs">{actionError}</p>
           )}
           <button
             type="submit"
             disabled={actionLoading === "create"}
-            className="w-full rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 py-3.5 text-sm font-bold text-white shadow-lg transition-all duration-300 hover:shadow-xl active:scale-[0.98] disabled:opacity-70"
+            className="sf-btn-primary w-full py-3.5 text-sm disabled:opacity-70"
           >
             {actionLoading === "create" ? (
               <Loader2 size={18} className="mx-auto animate-spin" />
             ) : (
-              "Опубликовать 🚀"
+              "Опубликовать"
             )}
           </button>
         </form>

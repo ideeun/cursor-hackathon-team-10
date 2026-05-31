@@ -26,8 +26,8 @@ export default function CountdownTimer({ until }: { until: string }) {
   }, [until]);
 
   return (
-    <div className="flex items-center gap-1.5 rounded-2xl bg-red-50 px-3 py-2 text-xs font-bold text-red-600">
-      <Clock size={13} />
+    <div className="flex items-center gap-1.5 rounded-xl bg-peach-soft px-3 py-2 text-xs font-medium text-peach-deep">
+      <Clock size={13} strokeWidth={1.75} />
       До конца регистрации: {remaining}
     </div>
   );

@@ -8,8 +8,8 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="sticky bottom-0 z-40 border-t border-orange-100/80 bg-white/90 backdrop-blur-xl lg:hidden">
-      <div className="flex items-center justify-around px-2 py-2">
+    <nav className="sticky bottom-0 z-40 border-t border-sand bg-white/95 backdrop-blur-md lg:hidden">
+      <div className="flex items-center justify-around px-2 py-2.5">
         {NAV_TABS.map((tab) => {
           const active = isNavActive(pathname, tab.href);
           const Icon = tab.icon;
@@ -17,20 +17,14 @@ export default function BottomNav() {
             <Link
               key={tab.href}
               href={tab.href}
-              className={`flex flex-col items-center gap-0.5 rounded-2xl px-3 py-1.5 transition-all duration-300 ${
-                active ? "text-orange-500" : "text-stone-400 hover:text-stone-600"
+              className={`flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition-colors duration-200 ${
+                active ? "text-peach-deep" : "text-ink-faint hover:text-ink-light"
               }`}
             >
-              <span
-                className={`transition-transform duration-300 ${
-                  active ? "scale-110" : ""
-                }`}
-              >
-                <Icon size={20} />
-              </span>
-              <span className="text-[10px] font-semibold">{tab.label}</span>
+              <Icon size={20} strokeWidth={active ? 2.25 : 1.75} />
+              <span className="text-[10px] font-medium">{tab.label}</span>
               {active && (
-                <span className="h-0.5 w-4 rounded-full bg-orange-500" />
+                <span className="mt-0.5 h-0.5 w-5 rounded-full bg-peach-muted" />
               )}
             </Link>
           );

@@ -14,29 +14,29 @@ export default function ProfilePage() {
   const avatarLetter = displayName.charAt(0).toUpperCase();
 
   return (
-    <section className="rounded-3xl border border-orange-100 bg-white p-6 text-center shadow-md lg:mx-auto lg:max-w-xl lg:p-10">
-      <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-amber-500 text-2xl font-bold text-white">
+    <section className="sf-card mx-auto max-w-xl p-8 text-center lg:p-10">
+      <div className="sf-avatar mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full text-2xl">
         {avatarLetter}
       </div>
-      <h3 className="text-lg font-bold text-stone-800">{displayName}</h3>
-      <p className="text-sm text-stone-500">Level {level} Explorer</p>
-      <div className="mt-4 grid grid-cols-3 gap-3">
+      <h3 className="text-lg font-semibold text-ink">{displayName}</h3>
+      <p className="text-sm text-ink-light">Level {level} Explorer</p>
+      <div className="mt-6 grid grid-cols-3 gap-3">
         {[
           { label: "XP", value: String(xp) },
           { label: "Челленджи", value: String(participantCount) },
           { label: "Сборы", value: String(joinedGatherings) },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-2xl bg-orange-50 py-3">
-            <p className="text-lg font-black text-orange-600">{stat.value}</p>
-            <p className="text-[10px] text-stone-500">{stat.label}</p>
+          <div key={stat.label} className="rounded-xl bg-peach-soft/80 py-4">
+            <p className="text-lg font-semibold text-peach-deep">{stat.value}</p>
+            <p className="text-[10px] text-ink-light">{stat.label}</p>
           </div>
         ))}
       </div>
       <button
         onClick={() => signOut()}
-        className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl border border-stone-200 py-3 text-sm font-semibold text-stone-600 transition-all duration-300 hover:bg-stone-50"
+        className="sf-btn-ghost mt-6 flex w-full items-center justify-center gap-2 py-3 text-sm"
       >
-        <LogOut size={16} />
+        <LogOut size={16} strokeWidth={1.75} />
         Выйти
       </button>
     </section>
