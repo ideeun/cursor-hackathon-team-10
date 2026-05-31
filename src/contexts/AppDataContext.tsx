@@ -76,6 +76,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const { user, profile } = useAuth();
   const uid = user!.uid;
   const displayName = profile?.name ?? "Путешественник";
+  const userEmail = profile?.email ?? user?.email ?? undefined;
 
   const [isSoloMode, setIsSoloMode] = useState(true);
   const [challenges, setChallenges] = useState<ChallengeItem[]>([]);
@@ -128,7 +129,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     setActionLoading(id);
     setActionError(null);
     try {
-      await joinGathering(id, uid);
+      await joinGathering(id, uid, {
+        name: displayName,
+        email: userEmail,
+      });
       await addXp(uid, 50);
       if (isSecret) setLocationRevealed(true);
     } catch (err) {
@@ -160,7 +164,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           emoji: "✨",
         },
         uid,
-        displayName
+        displayName,
+        userEmail
       );
       setFormTitle("");
       setFormDescription("");

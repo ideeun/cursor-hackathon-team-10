@@ -13,6 +13,10 @@ export interface KgEvent {
   title: string;
   date: string;
   location: string;
+  address: string;
+  startTime: string;
+  contact?: string;
+  url?: string;
   type: KgEventType;
   isFree: boolean;
   price?: string;
@@ -54,9 +58,29 @@ export function filterKgEvents(
 export function searchKgEvents(events: KgEvent[], query: string): KgEvent[] {
   const normalized = query.trim().toLowerCase();
   if (!normalized) return events;
-  return events.filter((e) =>
-    e.title.toLowerCase().includes(normalized)
-  );
+  return events.filter((e) => {
+    const haystack = [
+      e.title,
+      e.location,
+      e.address,
+      e.contact ?? "",
+    ]
+      .join(" ")
+      .toLowerCase();
+    return haystack.includes(normalized);
+  });
+}
+
+/** Текст для челленджа / карточки с деталями ивента */
+export function formatEventDetails(event: KgEvent): string {
+  const lines = [
+    `${formatEventDate(event.date)}, ${event.startTime}`,
+    `📍 ${event.address}`,
+    event.isFree ? "Бесплатно" : (event.price ?? "Платно"),
+  ];
+  if (event.contact) lines.push(`Контакт: ${event.contact}`);
+  if (event.url) lines.push(event.url);
+  return lines.join("\n");
 }
 
 export function sortKgEvents(

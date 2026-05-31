@@ -110,6 +110,7 @@ export interface QuestDoc {
 
 export interface ChallengeDoc {
   title: string;
+  description?: string;
   emoji: string;
   type: "progress" | "leaderboard" | "status";
   current_progress?: number;
@@ -129,6 +130,8 @@ export interface GatheringDoc {
   max_spots: number;
   spots_left: number;
   attendees: string[];
+  attendeeNames?: Record<string, string>;
+  attendeeEmails?: Record<string, string>;
   category: string;
   emoji: string;
   join_label?: string;

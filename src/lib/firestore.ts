@@ -63,7 +63,11 @@ export async function joinChallenge(challengeId: string, uid: string) {
   });
 }
 
-export async function joinGathering(gatheringId: string, uid: string) {
+export async function joinGathering(
+  gatheringId: string,
+  uid: string,
+  attendee: { name: string; email?: string }
+) {
   const ref = doc(db, "gatherings", gatheringId);
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(ref);
@@ -71,10 +75,16 @@ export async function joinGathering(gatheringId: string, uid: string) {
     const data = snap.data() as GatheringDoc;
     if (data.attendees.includes(uid)) return;
     if (data.spots_left <= 0) throw new Error("Мест больше нет");
-    tx.update(ref, {
+    const update: Record<string, unknown> = {
       attendees: arrayUnion(uid),
       spots_left: increment(-1),
-    });
+      [`attendeeNames.${uid}`]: attendee.name,
+    };
+    const email = attendee.email?.trim().toLowerCase();
+    if (email) {
+      update[`attendeeEmails.${uid}`] = email;
+    }
+    tx.update(ref, update);
   });
 }
 
@@ -83,7 +93,8 @@ export async function createGathering(
     max_spots: number;
   },
   hostId: string,
-  hostName: string
+  hostName: string,
+  hostEmail?: string
 ) {
   await addDoc(collection(db, "gatherings"), {
     title: data.title,
@@ -100,6 +111,10 @@ export async function createGathering(
     host_id: hostId,
     host_name: hostName,
     attendees: [hostId],
+    attendeeNames: { [hostId]: hostName },
+    ...(hostEmail
+      ? { attendeeEmails: { [hostId]: hostEmail.trim().toLowerCase() } }
+      : {}),
     spots_left: Math.max(0, data.max_spots - 1),
   });
 }
@@ -124,6 +139,7 @@ export async function createChallengeFromActivity(
   await createChallenge(
     {
       title: activity.title,
+      description: activity.description,
       emoji: "🎯",
       type: "status",
     },

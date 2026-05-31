@@ -1,11 +1,27 @@
 "use client";
 
-import { Loader2, Users, MapPinned } from "lucide-react";
+import { Loader2, Mail, UserCheck, Users, MapPinned } from "lucide-react";
 import { SECRET_EVENT } from "@/lib/activities";
+import { useAuth } from "@/contexts/AuthContext";
 import { useAppData } from "@/contexts/AppDataContext";
 import CountdownTimer from "@/components/ui/CountdownTimer";
+import type { GatheringDoc } from "@/lib/types";
+
+function getGuestAttendees(
+  gathering: GatheringDoc & { id: string }
+): { uid: string; name: string; email?: string }[] {
+  return gathering.attendees
+    .filter((id) => id !== gathering.host_id)
+    .map((id) => ({
+      uid: id,
+      name: gathering.attendeeNames?.[id] ?? "Участник",
+      email: gathering.attendeeEmails?.[id],
+    }));
+}
 
 export default function GatheringsPage() {
+  const { user } = useAuth();
+  const uid = user?.uid;
   const { gatherings, actionLoading, handleJoinGathering, openGatheringModal } =
     useAppData();
 
@@ -31,7 +47,11 @@ export default function GatheringsPage() {
       )}
 
       <div className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0 xl:grid-cols-3">
-        {gatherings.map((gathering) => (
+        {gatherings.map((gathering) => {
+          const isHost = uid === gathering.host_id;
+          const guests = getGuestAttendees(gathering);
+
+          return (
           <div
             key={gathering.id}
             className={`sf-card sf-card-hover p-4 ${
@@ -81,6 +101,42 @@ export default function GatheringsPage() {
               </span>
             </div>
 
+            {isHost && (
+              <div className="mb-3 rounded-xl border border-sand bg-stone-50/80 p-3">
+                <p className="mb-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
+                  <UserCheck size={12} className="text-peach-muted" />
+                  Кто присоединился ({guests.length})
+                </p>
+                {guests.length === 0 ? (
+                  <p className="text-xs text-ink-light">
+                    Пока никто не записался — ждём участников
+                  </p>
+                ) : (
+                  <ul className="space-y-2">
+                    {guests.map((guest) => (
+                      <li
+                        key={guest.uid}
+                        className="rounded-lg bg-white px-2.5 py-2 text-xs"
+                      >
+                        <p className="font-medium text-ink">{guest.name}</p>
+                        {guest.email ? (
+                          <a
+                            href={`mailto:${guest.email}`}
+                            className="mt-0.5 inline-flex items-center gap-1 text-ink-light hover:text-peach-deep"
+                          >
+                            <Mail size={11} className="shrink-0 text-peach-muted" />
+                            {guest.email}
+                          </a>
+                        ) : (
+                          <p className="mt-0.5 text-ink-faint">Email не указан</p>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+
             <button
               onClick={() =>
                 handleJoinGathering(gathering.id, gathering.is_secret)
@@ -111,7 +167,8 @@ export default function GatheringsPage() {
               )}
             </button>
           </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

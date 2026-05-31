@@ -40,6 +40,12 @@ export default function ChallengesPage() {
               <h3 className="text-sm font-medium text-ink">{challenge.title}</h3>
             </div>
 
+            {challenge.description && (
+              <p className="mb-3 whitespace-pre-line text-xs leading-relaxed text-ink-light">
+                {challenge.description}
+              </p>
+            )}
+
             {challenge.type === "progress" && (
               <ProgressBar
                 current={challenge.current_progress ?? 0}

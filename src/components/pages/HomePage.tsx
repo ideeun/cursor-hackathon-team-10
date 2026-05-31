@@ -6,8 +6,11 @@ import {
   ArrowDownUp,
   Calendar,
   ChevronDown,
+  Clock,
+  ExternalLink,
   Loader2,
   MapPin,
+  Phone,
   Search,
   Ticket,
 } from "lucide-react";
@@ -17,6 +20,7 @@ import {
   fetchKgEvents,
   filterKgEvents,
   formatEventDate,
+  formatEventDetails,
   getSortLabel,
   KG_EVENT_TYPES,
   searchKgEvents,
@@ -28,12 +32,8 @@ import {
 
 export default function HomePage() {
   const router = useRouter();
-  const {
-    actionLoading,
-    handleAddActivityToChallenges,
-    openGatheringModal,
-    actionError,
-  } = useAppData();
+  const { actionLoading, handleAddActivityToChallenges, actionError } =
+    useAppData();
 
   const [showFree, setShowFree] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -323,13 +323,73 @@ export default function HomePage() {
                 </button>
 
                 {open && (
-                  <div className="mt-1.5 flex gap-2 rounded-xl bg-stone-50 p-2">
+                  <div className="mt-1.5 space-y-2 rounded-xl bg-stone-50 p-3">
+                    <div className="space-y-1.5 text-xs text-ink-light">
+                      <p className="inline-flex items-start gap-1.5">
+                        <Clock
+                          size={12}
+                          className="mt-0.5 shrink-0 text-peach-muted"
+                        />
+                        <span>
+                          {formatEventDate(event.date)}, начало{" "}
+                          <span className="font-medium text-ink">
+                            {event.startTime}
+                          </span>
+                        </span>
+                      </p>
+                      <p className="inline-flex items-start gap-1.5">
+                        <MapPin
+                          size={12}
+                          className="mt-0.5 shrink-0 text-peach-muted"
+                        />
+                        <span>
+                          <span className="text-ink-faint">{event.location} · </span>
+                          {event.address}
+                        </span>
+                      </p>
+                      {event.contact && (
+                        <p className="inline-flex items-center gap-1.5">
+                          <Phone size={12} className="shrink-0 text-peach-muted" />
+                          {event.contact.startsWith("+") ? (
+                            <a
+                              href={`tel:${event.contact.replace(/\s/g, "")}`}
+                              className="font-medium text-peach-deep hover:underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {event.contact}
+                            </a>
+                          ) : (
+                            <span className="font-medium text-peach-deep">
+                              {event.contact}
+                            </span>
+                          )}
+                        </p>
+                      )}
+                      {event.url && (
+                        <p className="inline-flex items-center gap-1.5">
+                          <ExternalLink
+                            size={12}
+                            className="shrink-0 text-peach-muted"
+                          />
+                          <a
+                            href={event.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="truncate font-medium text-peach-deep hover:underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Подробнее и билеты
+                          </a>
+                        </p>
+                      )}
+                    </div>
                     <button
+                      type="button"
                       onClick={async () => {
                         try {
                           await handleAddActivityToChallenges({
                             title: event.title,
-                            description: `${formatEventDate(event.date)} · ${event.location}`,
+                            description: formatEventDetails(event),
                           });
                           router.push("/challenges");
                         } catch {
@@ -337,25 +397,13 @@ export default function HomePage() {
                         }
                       }}
                       disabled={actionLoading === "add-challenge"}
-                      className="sf-btn-primary flex-1 py-2 text-[11px] disabled:opacity-70"
+                      className="sf-btn-primary w-full py-2 text-[11px] disabled:opacity-70"
                     >
                       {actionLoading === "add-challenge" ? (
                         <Loader2 size={12} className="mx-auto animate-spin" />
                       ) : (
                         "В челленджи"
                       )}
-                    </button>
-                    <button
-                      onClick={() => {
-                        openGatheringModal(
-                          event.title,
-                          `${formatEventDate(event.date)} · ${event.location}`
-                        );
-                        router.push("/gatherings");
-                      }}
-                      className="sf-btn-soft flex-1 py-2 text-[11px]"
-                    >
-                      Собрать компанию
                     </button>
                   </div>
                 )}
