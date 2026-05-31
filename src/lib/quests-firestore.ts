@@ -20,6 +20,20 @@ import type {
   QuestType,
 } from "./types";
 
+function omitUndefined<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.map((item) => omitUndefined(item)) as T;
+  }
+  if (value !== null && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .filter(([, v]) => v !== undefined)
+        .map(([k, v]) => [k, omitUndefined(v)])
+    ) as T;
+  }
+  return value;
+}
+
 export function subscribeMyQuests(
   uid: string,
   callback: (items: ({ id: string } & QuestDoc)[]) => void
@@ -105,25 +119,28 @@ export async function createQuest(params: {
     };
   }
 
-  const docRef = await addDoc(collection(db, "quests"), {
-    title: params.title,
-    creatorId: params.creatorId,
-    creatorName: params.creatorName,
-    district: params.district,
-    questType: params.questType,
-    sport: params.sport,
-    skill: params.skill,
-    emoji: params.emoji,
-    endsAt: params.endsAt,
-    status: participants.length > 1 ? "active" : "waiting",
-    participants,
-    participantNames,
-    invitedEmails: notFoundEmails,
-    checkpoints: params.checkpoints,
-    participantProgress,
-    createdAt: now,
-    startedAt: participants.length > 1 ? now : undefined,
-  } satisfies QuestDoc);
+  const docRef = await addDoc(
+    collection(db, "quests"),
+    omitUndefined({
+      title: params.title,
+      creatorId: params.creatorId,
+      creatorName: params.creatorName,
+      district: params.district,
+      questType: params.questType,
+      sport: params.sport,
+      skill: params.skill,
+      emoji: params.emoji,
+      endsAt: params.endsAt,
+      status: participants.length > 1 ? "active" : "waiting",
+      participants,
+      participantNames,
+      invitedEmails: notFoundEmails,
+      checkpoints: params.checkpoints,
+      participantProgress,
+      createdAt: now,
+      startedAt: participants.length > 1 ? now : undefined,
+    }) satisfies QuestDoc
+  );
 
   return docRef.id;
 }

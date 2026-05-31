@@ -13,6 +13,8 @@ export interface FriendEntry {
   name?: string;
 }
 
+const EMPTY_FRIENDS: FriendEntry[] = [];
+
 interface FriendEmailPickerProps {
   currentUid: string;
   addedFriends?: FriendEntry[];
@@ -23,7 +25,7 @@ interface FriendEmailPickerProps {
 
 export default function FriendEmailPicker({
   currentUid,
-  addedFriends = [],
+  addedFriends = EMPTY_FRIENDS,
   onAdd,
   onRemove,
   placeholder = "Начните вводить email друга...",
@@ -36,15 +38,20 @@ export default function FriendEmailPicker({
   const [inputError, setInputError] = useState<string | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const addedEmails = useMemo(
-    () => new Set(addedFriends.map((f) => f.email.toLowerCase())),
+  const addedEmailsKey = useMemo(
+    () => addedFriends.map((f) => f.email.toLowerCase()).sort().join("\0"),
     [addedFriends]
+  );
+
+  const addedEmails = useMemo(
+    () => new Set(addedEmailsKey ? addedEmailsKey.split("\0") : []),
+    [addedEmailsKey]
   );
 
   useEffect(() => {
     if (input.trim().length < 2) {
-      setSuggestions([]);
-      setSearching(false);
+      setSuggestions((prev) => (prev.length === 0 ? prev : []));
+      setSearching((prev) => (prev ? false : prev));
       return;
     }
 
@@ -65,7 +72,7 @@ export default function FriendEmailPicker({
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [input, currentUid, addedEmails]);
+  }, [input, currentUid, addedEmailsKey, addedEmails]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
