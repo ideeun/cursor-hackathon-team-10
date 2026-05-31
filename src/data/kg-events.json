@@ -1,0 +1,155 @@
+[
+  {
+    "id": "e1",
+    "title": "Open Air Festival",
+    "date": "2026-06-10",
+    "location": "Бишкек",
+    "type": "music",
+    "isFree": false,
+    "price": "от 800 сом"
+  },
+  {
+    "id": "e2",
+    "title": "Йога в парке Панфилова",
+    "date": "2026-06-05",
+    "location": "Бишкек",
+    "type": "sport",
+    "isFree": true
+  },
+  {
+    "id": "e3",
+    "title": "Фестиваль на Иссык-Куле",
+    "date": "2026-07-12",
+    "location": "Чолпон-Ата",
+    "type": "festival",
+    "isFree": false,
+    "price": "от 1 500 сом"
+  },
+  {
+    "id": "e4",
+    "title": "День открытых дверей в музее",
+    "date": "2026-06-18",
+    "location": "Бишкек",
+    "type": "culture",
+    "isFree": true
+  },
+  {
+    "id": "e5",
+    "title": "Концерт на площади Ала-Тоо",
+    "date": "2026-06-21",
+    "location": "Бишкек",
+    "type": "music",
+    "isFree": true
+  },
+  {
+    "id": "e6",
+    "title": "Рафтинг по реке Чу",
+    "date": "2026-06-14",
+    "location": "Бишкекская обл.",
+    "type": "outdoor",
+    "isFree": false,
+    "price": "3 500 сом"
+  },
+  {
+    "id": "e7",
+    "title": "Street Art тур по центру",
+    "date": "2026-06-08",
+    "location": "Бишкек",
+    "type": "culture",
+    "isFree": true
+  },
+  {
+    "id": "e8",
+    "title": "Кино под звёздами",
+    "date": "2026-06-28",
+    "location": "Каракол",
+    "type": "culture",
+    "isFree": false,
+    "price": "600 сом"
+  },
+  {
+    "id": "e9",
+    "title": "Фуд-корт «Летний вкус»",
+    "date": "2026-06-15",
+    "location": "Ош",
+    "type": "food",
+    "isFree": true
+  },
+  {
+    "id": "e10",
+    "title": "Мастер-класс по керамике",
+    "date": "2026-06-11",
+    "location": "Бишкек",
+    "type": "culture",
+    "isFree": false,
+    "price": "1 200 сом"
+  },
+  {
+    "id": "e11",
+    "title": "Скейт-площадка: открытая сессия",
+    "date": "2026-06-07",
+    "location": "Бишкек",
+    "type": "sport",
+    "isFree": true
+  },
+  {
+    "id": "e12",
+    "title": "Ночь в обсерватории",
+    "date": "2026-07-05",
+    "location": "Чолпон-Ата",
+    "type": "culture",
+    "isFree": false,
+    "price": "2 000 сом"
+  },
+  {
+    "id": "e13",
+    "title": "Поход к озеру Ала-Куль",
+    "date": "2026-06-20",
+    "location": "Каракол",
+    "type": "outdoor",
+    "isFree": true
+  },
+  {
+    "id": "e14",
+    "title": "Techno Night",
+    "date": "2026-06-22",
+    "location": "Бишкек",
+    "type": "music",
+    "isFree": false,
+    "price": "от 1 000 сом"
+  },
+  {
+    "id": "e15",
+    "title": "Вечер кыргызской поэзии",
+    "date": "2026-06-09",
+    "location": "Ош",
+    "type": "culture",
+    "isFree": true
+  },
+  {
+    "id": "e16",
+    "title": "Конная прогулка в ущелье",
+    "date": "2026-06-16",
+    "location": "Токмок",
+    "type": "outdoor",
+    "isFree": false,
+    "price": "2 500 сом"
+  },
+  {
+    "id": "e17",
+    "title": "День города Бишкек",
+    "date": "2026-06-29",
+    "location": "Бишкек",
+    "type": "festival",
+    "isFree": true
+  },
+  {
+    "id": "e18",
+    "title": "Jazz на террасе",
+    "date": "2026-06-13",
+    "location": "Бишкек",
+    "type": "music",
+    "isFree": false,
+    "price": "от 900 сом"
+  }
+]

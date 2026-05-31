@@ -1,200 +1,192 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Sparkles, MapPinned } from "lucide-react";
-import { ACTIVITIES, SECRET_EVENT } from "@/lib/activities";
+import { Calendar, Loader2, MapPin, Ticket } from "lucide-react";
 import { useAppData } from "@/contexts/AppDataContext";
-import ToggleSwitch from "@/components/ui/ToggleSwitch";
-import CountdownTimer from "@/components/ui/CountdownTimer";
-import type { Activity, ActivityMode } from "@/lib/types";
-
-type AiResult =
-  | (Activity & { isSecret?: false })
-  | (typeof SECRET_EVENT & { isSecret: true });
+import {
+  EVENT_TYPE_LABELS,
+  fetchKgEvents,
+  filterKgEvents,
+  formatEventDate,
+  type KgEvent,
+} from "@/lib/kg-events";
 
 export default function HomePage() {
   const router = useRouter();
   const {
-    isSoloMode,
-    setIsSoloMode,
-    gatherings,
     actionLoading,
-    handleJoinGathering,
     handleAddActivityToChallenges,
     openGatheringModal,
-    locationRevealed,
     actionError,
   } = useAppData();
 
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiResult, setAiResult] = useState<AiResult | null>(null);
-  const [secretFlash, setSecretFlash] = useState(false);
+  const [showFree, setShowFree] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [events, setEvents] = useState<KgEvent[]>([]);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const handleBoredClick = () => {
-    setAiLoading(true);
-    setAiResult(null);
-
-    setTimeout(() => {
-      const roll = Math.floor(Math.random() * 100) + 1;
-      const isSecret = roll <= 5;
-
-      if (isSecret) {
-        setSecretFlash(true);
-        setTimeout(() => setSecretFlash(false), 1200);
-        setAiResult({ ...SECRET_EVENT, isSecret: true });
-      } else {
-        const mode: ActivityMode = isSoloMode ? "solo" : "friends";
-        const filtered = ACTIVITIES.filter((a) => a.mode === mode);
-        const random =
-          filtered[Math.floor(Math.random() * filtered.length)] ?? filtered[0];
-        setAiResult(random);
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    fetchKgEvents().then((data) => {
+      if (!cancelled) {
+        setEvents(data);
+        setLoading(false);
       }
-      setAiLoading(false);
-    }, 1000);
-  };
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const visible = filterKgEvents(events, showFree);
 
   return (
-    <>
-      {secretFlash && <div className="secret-flash-overlay" aria-hidden />}
-
-      <div className="mb-4 flex justify-center">
-        <ToggleSwitch
-          isSolo={isSoloMode}
-          onToggle={() => {
-            setIsSoloMode((v) => !v);
-            setAiResult(null);
-          }}
-        />
+    <section className="space-y-3">
+      <div>
+        <h2 className="text-base font-bold text-stone-800">
+          Ивенты в Кыргызстане
+        </h2>
+        <p className="text-xs text-stone-500">Бесплатные и платные</p>
       </div>
 
-      <section className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Sparkles size={18} className="text-orange-500" />
-          <h2 className="text-base font-bold text-stone-800">
-            AI-генератор активностей
-          </h2>
-        </div>
-
-        <button
-          onClick={handleBoredClick}
-          disabled={aiLoading}
-          className="animate-pulse-glow w-full rounded-3xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 py-5 text-xl font-black tracking-wide text-white shadow-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl active:scale-[0.98] disabled:opacity-80"
+      <button
+        onClick={() => {
+          setShowFree((v) => !v);
+          setExpandedId(null);
+        }}
+        className="relative flex h-10 w-full max-w-xs items-center rounded-full bg-gradient-to-r from-emerald-100 to-orange-100 p-1 shadow-inner"
+        aria-label="Бесплатные или платные"
+      >
+        <span
+          className={`absolute h-8 w-[calc(50%-4px)] rounded-full shadow-lg transition-all duration-300 ease-out ${
+            showFree
+              ? "left-1 bg-gradient-to-r from-emerald-500 to-emerald-400"
+              : "left-[calc(50%+2px)] bg-gradient-to-r from-orange-500 to-amber-400"
+          }`}
+        />
+        <span
+          className={`relative z-10 flex-1 text-center text-xs font-bold transition-colors ${
+            showFree ? "text-white" : "text-stone-500"
+          }`}
         >
-          {aiLoading ? (
-            <span className="flex items-center justify-center gap-3 text-base">
-              <Loader2 size={22} className="animate-spin-slow" />
-              AI подбирает активность...
-            </span>
-          ) : (
-            "МНЕ СКУЧНО! 🌴"
-          )}
-        </button>
+          Бесплатные
+        </span>
+        <span
+          className={`relative z-10 flex-1 text-center text-xs font-bold transition-colors ${
+            !showFree ? "text-white" : "text-stone-500"
+          }`}
+        >
+          Платные
+        </span>
+      </button>
 
-        {aiLoading && (
-          <div className="space-y-2 rounded-3xl border border-orange-100 bg-white p-5 shadow-lg">
-            <div className="h-4 w-3/4 animate-pulse rounded-lg bg-orange-100" />
-            <div className="h-3 w-full animate-pulse rounded-lg bg-stone-100" />
-            <div className="h-3 w-5/6 animate-pulse rounded-lg bg-stone-100" />
-          </div>
-        )}
+      {loading && (
+        <div className="flex items-center justify-center gap-2 py-8 text-sm text-stone-500">
+          <Loader2 size={18} className="animate-spin text-orange-500" />
+          Загружаем ивенты...
+        </div>
+      )}
 
-        {aiResult && !aiLoading && (
-          <div
-            className={`space-y-3 rounded-3xl border p-5 shadow-lg transition-all duration-300 animate-in ${
-              aiResult.isSecret
-                ? "secret-card border-transparent bg-gradient-to-br from-amber-50 to-orange-50"
-                : "border-orange-100 bg-white"
-            }`}
-          >
-            {aiResult.isSecret && (
-              <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-amber-600">
-                <Sparkles size={14} />
-                Эксклюзив — 5% шанс!
-              </div>
-            )}
-            <div className="flex items-start justify-between">
-              <h3 className="text-lg font-bold text-stone-800">
-                {aiResult.title}
-              </h3>
-              <span className="rounded-full bg-orange-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-orange-600">
-                {aiResult.mode === "solo" ? "Соло" : "С друзьями"}
-              </span>
-            </div>
-            <p className="text-sm leading-relaxed text-stone-600">
-              {aiResult.description}
-            </p>
-            {aiResult.isSecret && (
-              <>
-                <div className="flex items-center gap-2 rounded-2xl bg-amber-100/80 px-3 py-2 text-sm font-semibold text-amber-800">
-                  <MapPinned size={15} />
-                  {locationRevealed
-                    ? SECRET_EVENT.revealedLocation
-                    : SECRET_EVENT.hiddenLocation}
-                </div>
-                <CountdownTimer until={SECRET_EVENT.availableUntil} />
-              </>
-            )}
-            <div className="flex items-center gap-2 rounded-2xl bg-emerald-50 px-3 py-2">
-              <span className="text-xs text-stone-500">Бюджет:</span>
-              <span className="text-sm font-bold text-emerald-700">
-                {aiResult.budget}
-              </span>
-            </div>
-            <div className="flex gap-2 pt-1">
-              <button
-                onClick={async () => {
-                  try {
-                    await handleAddActivityToChallenges({
-                      title: aiResult.title,
-                      description: aiResult.description,
-                    });
-                    router.push("/challenges");
-                  } catch {
-                    // error shown in banner
+      {!loading && visible.length === 0 && (
+        <p className="rounded-2xl bg-white/80 px-4 py-6 text-center text-sm text-stone-500">
+          Пока нет {showFree ? "бесплатных" : "платных"} ивентов
+        </p>
+      )}
+
+      {!loading && (
+        <ul className="space-y-2">
+          {visible.map((event) => {
+            const open = expandedId === event.id;
+            return (
+              <li key={event.id}>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setExpandedId(open ? null : event.id)
                   }
-                }}
-                disabled={actionLoading === "add-challenge"}
-                className="flex-1 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 py-2.5 text-xs font-bold text-white shadow-md transition-all duration-300 hover:shadow-lg active:scale-95 disabled:opacity-70"
-              >
-                {actionLoading === "add-challenge" ? (
-                  <Loader2 size={14} className="mx-auto animate-spin" />
-                ) : (
-                  "В челленджи 🏃‍♂️"
+                  className="w-full rounded-2xl border border-orange-100 bg-white p-3.5 text-left shadow-sm transition-shadow hover:shadow-md"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="font-semibold text-stone-800">
+                      {event.title}
+                    </span>
+                    <span className="shrink-0 rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-bold uppercase text-orange-600">
+                      {EVENT_TYPE_LABELS[event.type]}
+                    </span>
+                  </div>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500">
+                    <span className="inline-flex items-center gap-1">
+                      <Calendar size={12} className="text-sky-500" />
+                      {formatEventDate(event.date)}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <MapPin size={12} className="text-emerald-500" />
+                      {event.location}
+                    </span>
+                    <span
+                      className={`inline-flex items-center gap-1 font-semibold ${
+                        event.isFree ? "text-emerald-600" : "text-orange-600"
+                      }`}
+                    >
+                      <Ticket size={12} />
+                      {event.isFree ? "Бесплатно" : event.price}
+                    </span>
+                  </div>
+                </button>
+
+                {open && (
+                  <div className="mt-1 flex gap-2 rounded-2xl border border-orange-50 bg-orange-50/50 p-2">
+                    <button
+                      onClick={async () => {
+                        try {
+                          await handleAddActivityToChallenges({
+                            title: event.title,
+                            description: `${formatEventDate(event.date)} · ${event.location}`,
+                          });
+                          router.push("/challenges");
+                        } catch {
+                          // banner
+                        }
+                      }}
+                      disabled={actionLoading === "add-challenge"}
+                      className="flex-1 rounded-xl bg-emerald-500 py-2 text-[11px] font-bold text-white disabled:opacity-70"
+                    >
+                      {actionLoading === "add-challenge" ? (
+                        <Loader2
+                          size={12}
+                          className="mx-auto animate-spin"
+                        />
+                      ) : (
+                        "В челленджи"
+                      )}
+                    </button>
+                    <button
+                      onClick={() => {
+                        openGatheringModal(
+                          event.title,
+                          `${formatEventDate(event.date)} · ${event.location}`
+                        );
+                        router.push("/gatherings");
+                      }}
+                      className="flex-1 rounded-xl bg-sky-500 py-2 text-[11px] font-bold text-white"
+                    >
+                      Собрать компанию
+                    </button>
+                  </div>
                 )}
-              </button>
-              <button
-                onClick={() => {
-                  openGatheringModal(aiResult.title, aiResult.description);
-                  router.push("/gatherings");
-                }}
-                className="flex-1 rounded-2xl bg-gradient-to-r from-sky-500 to-sky-600 py-2.5 text-xs font-bold text-white shadow-md transition-all duration-300 hover:shadow-lg active:scale-95"
-              >
-                Собрать компанию 👥
-              </button>
-            </div>
-            {aiResult.isSecret && (
-              <button
-                onClick={() => handleJoinGathering("secret_camp_007", true)}
-                disabled={
-                  actionLoading === "secret_camp_007" ||
-                  gatherings.find((g) => g.id === "secret_camp_007")?.isJoined
-                }
-                className="w-full rounded-2xl bg-gradient-to-r from-amber-500 via-red-500 to-yellow-500 py-3 text-sm font-black text-white shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-95 disabled:opacity-70"
-              >
-                {gatherings.find((g) => g.id === "secret_camp_007")?.isJoined
-                  ? "Вы в деле! 🎒"
-                  : "Я В ДЕЛЕ! 🎒"}
-              </button>
-            )}
-          </div>
-        )}
-        {actionError && (
-          <p className="rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600">
-            {actionError}
-          </p>
-        )}
-      </section>
-    </>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {actionError && (
+        <p className="rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600">
+          {actionError}
+        </p>
+      )}
+    </section>
   );
 }
