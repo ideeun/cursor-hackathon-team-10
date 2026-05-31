@@ -21,8 +21,10 @@ export default function HomePage() {
     gatherings,
     actionLoading,
     handleJoinGathering,
+    handleAddActivityToChallenges,
     openGatheringModal,
     locationRevealed,
+    actionError,
   } = useAppData();
 
   const [aiLoading, setAiLoading] = useState(false);
@@ -141,10 +143,25 @@ export default function HomePage() {
             </div>
             <div className="flex gap-2 pt-1">
               <button
-                onClick={() => router.push("/challenges")}
-                className="flex-1 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 py-2.5 text-xs font-bold text-white shadow-md transition-all duration-300 hover:shadow-lg active:scale-95"
+                onClick={async () => {
+                  try {
+                    await handleAddActivityToChallenges({
+                      title: aiResult.title,
+                      description: aiResult.description,
+                    });
+                    router.push("/challenges");
+                  } catch {
+                    // error shown in banner
+                  }
+                }}
+                disabled={actionLoading === "add-challenge"}
+                className="flex-1 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 py-2.5 text-xs font-bold text-white shadow-md transition-all duration-300 hover:shadow-lg active:scale-95 disabled:opacity-70"
               >
-                В челленджи 🏃‍♂️
+                {actionLoading === "add-challenge" ? (
+                  <Loader2 size={14} className="mx-auto animate-spin" />
+                ) : (
+                  "В челленджи 🏃‍♂️"
+                )}
               </button>
               <button
                 onClick={() => {
@@ -171,6 +188,11 @@ export default function HomePage() {
               </button>
             )}
           </div>
+        )}
+        {actionError && (
+          <p className="rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600">
+            {actionError}
+          </p>
         )}
       </section>
     </>

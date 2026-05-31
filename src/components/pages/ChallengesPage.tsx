@@ -5,7 +5,8 @@ import { useAppData } from "@/contexts/AppDataContext";
 import ProgressBar from "@/components/ui/ProgressBar";
 
 export default function ChallengesPage() {
-  const { challenges, actionLoading, handleJoinChallenge } = useAppData();
+  const { challenges, actionLoading, handleJoinChallenge, openChallengeModal } =
+    useAppData();
 
   return (
     <section className="space-y-3">
@@ -16,8 +17,19 @@ export default function ChallengesPage() {
             Летние челленджи
           </h2>
         </div>
-        <span className="text-xs text-stone-400">Свайп →</span>
+        <button
+          onClick={() => openChallengeModal()}
+          className="rounded-xl bg-emerald-500 px-3 py-1.5 text-xs font-bold text-white transition-all hover:bg-emerald-600"
+        >
+          + Создать
+        </button>
       </div>
+
+      {challenges.length === 0 && (
+        <p className="rounded-2xl bg-white p-4 text-center text-sm text-stone-500 shadow-sm">
+          Челленджей пока нет. Нажмите «+» или добавьте активность с главной.
+        </p>
+      )}
 
       <div className="flex gap-3 overflow-x-auto pb-2 snap-x [-ms-overflow-style:none] [scrollbar-width:none]">
         {challenges.map((challenge) => (

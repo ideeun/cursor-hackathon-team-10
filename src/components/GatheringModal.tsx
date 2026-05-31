@@ -17,6 +17,7 @@ export default function GatheringModal() {
     setFormMaxSpots,
     handleCreateGathering,
     actionLoading,
+    actionError,
   } = useAppData();
 
   if (!showModal) return null;
@@ -87,6 +88,11 @@ export default function GatheringModal() {
               className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition-all focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
             />
           </div>
+          {actionError && (
+            <p className="rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600">
+              {actionError}
+            </p>
+          )}
           <button
             type="submit"
             disabled={actionLoading === "create"}

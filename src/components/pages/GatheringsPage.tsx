@@ -6,14 +6,29 @@ import { useAppData } from "@/contexts/AppDataContext";
 import CountdownTimer from "@/components/ui/CountdownTimer";
 
 export default function GatheringsPage() {
-  const { gatherings, actionLoading, handleJoinGathering } = useAppData();
+  const { gatherings, actionLoading, handleJoinGathering, openGatheringModal } =
+    useAppData();
 
   return (
     <section className="space-y-3">
-      <div className="flex items-center gap-2">
-        <Users size={18} className="text-sky-500" />
-        <h2 className="text-base font-bold text-stone-800">Сборы и встречи</h2>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Users size={18} className="text-sky-500" />
+          <h2 className="text-base font-bold text-stone-800">Сборы и встречи</h2>
+        </div>
+        <button
+          onClick={() => openGatheringModal()}
+          className="rounded-xl bg-sky-500 px-3 py-1.5 text-xs font-bold text-white transition-all hover:bg-sky-600"
+        >
+          + Создать
+        </button>
       </div>
+
+      {gatherings.length === 0 && (
+        <p className="rounded-2xl bg-white p-4 text-center text-sm text-stone-500 shadow-sm">
+          Сборов пока нет. Нажмите «+» чтобы объявить встречу.
+        </p>
+      )}
 
       <div className="space-y-3">
         {gatherings.map((gathering) => (

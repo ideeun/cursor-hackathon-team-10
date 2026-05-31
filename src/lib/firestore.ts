@@ -79,18 +79,57 @@ export async function joinGathering(gatheringId: string, uid: string) {
 }
 
 export async function createGathering(
-  data: Omit<GatheringDoc, "attendees" | "spots_left"> & { max_spots: number },
+  data: Omit<GatheringDoc, "attendees" | "spots_left" | "host_id" | "host_name"> & {
+    max_spots: number;
+  },
   hostId: string,
   hostName: string
 ) {
   await addDoc(collection(db, "gatherings"), {
-    ...data,
+    title: data.title,
+    description: data.description,
+    date_time: data.date_time,
+    max_spots: data.max_spots,
+    category: data.category,
+    emoji: data.emoji,
+    join_label: data.join_label ?? "Присоединиться",
+    is_secret: data.is_secret,
+    secret_chance: data.secret_chance,
+    available_until: data.available_until,
+    hidden_location: data.hidden_location,
     host_id: hostId,
     host_name: hostName,
     attendees: [hostId],
     spots_left: Math.max(0, data.max_spots - 1),
-    join_label: data.join_label ?? "Присоединиться",
   });
+}
+
+export async function createChallenge(
+  data: Omit<ChallengeDoc, "participants" | "status">,
+  uid: string,
+  autoJoin = true
+) {
+  await addDoc(collection(db, "challenges"), {
+    ...data,
+    participants: autoJoin ? [uid] : [],
+    status: autoJoin ? "in_progress" : "available",
+    current_progress: data.current_progress ?? 0,
+  });
+}
+
+export async function createChallengeFromActivity(
+  activity: { title: string; description: string },
+  uid: string
+) {
+  await createChallenge(
+    {
+      title: activity.title,
+      emoji: "🎯",
+      type: "status",
+    },
+    uid,
+    true
+  );
 }
 
 export async function addXp(uid: string, amount: number) {
