@@ -1,7 +1,8 @@
-import { Home, Trophy, Users, User } from "lucide-react";
+import { Home, Trophy, Users, User, MapPin } from "lucide-react";
 
 export const NAV_TABS = [
   { href: "/", label: "Главная", icon: Home },
+  { href: "/quests", label: "Квесты", icon: MapPin },
   { href: "/challenges", label: "Челленджи", icon: Trophy },
   { href: "/gatherings", label: "Сборы", icon: Users },
   { href: "/profile", label: "Профиль", icon: User },
@@ -15,6 +16,7 @@ export function isNavActive(pathname: string, href: string): boolean {
 
 export const PAGE_TITLES: Record<NavHref | string, string> = {
   "/": "Ивенты в Кыргызстане",
+  "/quests": "Городские квесты",
   "/challenges": "Летние челленджи",
   "/gatherings": "Сборы и встречи",
   "/profile": "Профиль",

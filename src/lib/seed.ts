@@ -148,7 +148,8 @@ export function seedFirestoreIfEmpty(): Promise<void> {
 export async function ensureUserProfile(
   uid: string,
   name: string,
-  avatarUrl?: string
+  avatarUrl?: string,
+  email?: string
 ) {
   const userRef = doc(db, "users", uid);
   const snap = await getDoc(userRef);
@@ -157,9 +158,12 @@ export async function ensureUserProfile(
     await setDoc(userRef, {
       uid,
       name,
+      email: email?.toLowerCase() ?? "",
       level: 1,
       xp: 0,
       avatar_url: avatarUrl ?? "",
     });
+  } else if (email && !snap.data().email) {
+    await setDoc(userRef, { email: email.toLowerCase() }, { merge: true });
   }
 }

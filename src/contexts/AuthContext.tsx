@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user.displayName ||
         user.email?.split("@")[0] ||
         `Гость_${user.uid.slice(0, 4)}`;
-      await ensureUserProfile(user.uid, name, user.photoURL ?? undefined);
+      await ensureUserProfile(user.uid, name, user.photoURL ?? undefined, user.email ?? undefined);
 
       unsubProfile = onSnapshot(doc(db, "users", user.uid), (snap) => {
         if (snap.exists()) {
@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   ) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(cred.user, { displayName: name });
-    await ensureUserProfile(cred.user.uid, name);
+    await ensureUserProfile(cred.user.uid, name, undefined, email);
   };
 
   const signOut = async () => {
