@@ -33,7 +33,9 @@ export default function QuestsPage() {
         <div className="flex items-center gap-2 lg:hidden">
           <Sparkles size={18} className="text-peach-muted" />
           <div>
-            <h2 className="text-base font-semibold text-ink">Городские квесты</h2>
+            <h2 className="text-base font-semibold text-ink">
+              Городские квесты
+            </h2>
             <p className="text-xs text-ink-light">Бишкек · AI-маршруты</p>
           </div>
         </div>

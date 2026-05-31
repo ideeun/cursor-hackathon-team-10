@@ -1,10 +1,4 @@
-import {
-  collection,
-  getDocs,
-  limit,
-  query,
-  where,
-} from "firebase/firestore";
+import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import { db } from "./firebase";
 
 export interface UserSearchResult {
@@ -16,7 +10,7 @@ export interface UserSearchResult {
 export async function searchUsersByEmailPrefix(
   searchTerm: string,
   excludeUid: string,
-  maxResults = 6
+  maxResults = 6,
 ): Promise<UserSearchResult[]> {
   const term = searchTerm.trim().toLowerCase();
   if (term.length < 2) return [];
@@ -25,7 +19,7 @@ export async function searchUsersByEmailPrefix(
     collection(db, "users"),
     where("email", ">=", term),
     where("email", "<=", term + "\uf8ff"),
-    limit(maxResults + 5)
+    limit(maxResults + 5),
   );
 
   const snap = await getDocs(q);
@@ -52,14 +46,11 @@ export function isValidEmail(value: string): boolean {
 }
 
 export async function findUserByEmail(
-  email: string
+  email: string,
 ): Promise<{ uid: string; name: string } | null> {
   const normalized = email.trim().toLowerCase();
   if (!normalized) return null;
-  const q = query(
-    collection(db, "users"),
-    where("email", "==", normalized)
-  );
+  const q = query(collection(db, "users"), where("email", "==", normalized));
   const snap = await getDocs(q);
   if (snap.empty) return null;
   const data = snap.docs[0].data();

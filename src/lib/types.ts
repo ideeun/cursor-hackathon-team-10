@@ -73,6 +73,41 @@ export interface QuestDoc {
   winnerName?: string;
 }
 
+export interface QuestCheckpoint {
+  order: number;
+  title: string;
+  description: string;
+  hint: string;
+  lat: number;
+  lng: number;
+  radiusMeters: number;
+}
+
+export interface QuestParticipantProgress {
+  currentCheckpoint: number;
+  startedAt: string;
+  completedCount: number;
+  finishedAt?: string;
+  checkpointPhotos: Record<string, string>;
+}
+
+export interface QuestDoc {
+  title: string;
+  creatorId: string;
+  creatorName: string;
+  district: string;
+  status: "waiting" | "active" | "completed";
+  participants: string[];
+  participantNames: Record<string, string>;
+  invitedEmails: string[];
+  checkpoints: QuestCheckpoint[];
+  participantProgress: Record<string, QuestParticipantProgress>;
+  createdAt: string;
+  startedAt?: string;
+  winnerId?: string;
+  winnerName?: string;
+}
+
 export interface ChallengeDoc {
   title: string;
   emoji: string;

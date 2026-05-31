@@ -1,15 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar, Loader2, MapPin, Ticket } from "lucide-react";
+import {
+  ArrowDownUp,
+  Calendar,
+  ChevronDown,
+  Loader2,
+  MapPin,
+  Search,
+  Ticket,
+} from "lucide-react";
 import { useAppData } from "@/contexts/AppDataContext";
 import {
   EVENT_TYPE_LABELS,
   fetchKgEvents,
   filterKgEvents,
   formatEventDate,
+  getSortLabel,
+  KG_EVENT_TYPES,
+  searchKgEvents,
+  sortKgEvents,
   type KgEvent,
+  type KgEventSortMode,
+  type KgEventType,
 } from "@/lib/kg-events";
 
 export default function HomePage() {
@@ -22,9 +36,15 @@ export default function HomePage() {
   } = useAppData();
 
   const [showFree, setShowFree] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortMode, setSortMode] = useState<KgEventSortMode>("nearest");
+  const [eventType, setEventType] = useState<KgEventType | "all">("all");
+  const [sortOpen, setSortOpen] = useState(false);
+  const [typeExpanded, setTypeExpanded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState<KgEvent[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const sortRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -40,7 +60,57 @@ export default function HomePage() {
     };
   }, []);
 
-  const visible = filterKgEvents(events, showFree);
+  useEffect(() => {
+    if (!sortOpen) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
+        setSortOpen(false);
+        setTypeExpanded(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [sortOpen]);
+
+  const visible = useMemo(() => {
+    const filtered = filterKgEvents(events, {
+      freeOnly: showFree,
+      type: sortMode === "type" ? eventType : "all",
+    });
+    const searched = searchKgEvents(filtered, searchQuery);
+    return sortKgEvents(searched, sortMode);
+  }, [events, showFree, searchQuery, sortMode, eventType]);
+
+  const sortLabel = getSortLabel(sortMode, eventType);
+
+  const emptyMessage = (() => {
+    const priceLabel = showFree ? "бесплатных" : "платных";
+    if (searchQuery.trim()) {
+      return `Ничего не найдено по запросу «${searchQuery.trim()}»`;
+    }
+    if (sortMode === "type" && eventType !== "all") {
+      return `Нет ${priceLabel} ивентов типа «${EVENT_TYPE_LABELS[eventType]}»`;
+    }
+    return `Пока нет ${priceLabel} ивентов`;
+  })();
+
+  const selectNearest = () => {
+    setSortMode("nearest");
+    setEventType("all");
+    setSortOpen(false);
+    setTypeExpanded(false);
+    setExpandedId(null);
+  };
+
+  const selectType = (type: KgEventType | "all") => {
+    setSortMode("type");
+    setEventType(type);
+    setSortOpen(false);
+    setTypeExpanded(false);
+    setExpandedId(null);
+  };
 
   return (
     <section className="space-y-4">
@@ -54,34 +124,157 @@ export default function HomePage() {
         Бесплатные и платные ивенты по всей стране
       </p>
 
-      <button
-        onClick={() => {
-          setShowFree((v) => !v);
-          setExpandedId(null);
-        }}
-        className="relative flex h-10 w-full max-w-xs items-center rounded-full bg-stone-100 p-1 lg:max-w-sm"
-        aria-label="Бесплатные или платные"
-      >
-        <span
-          className={`absolute h-8 w-[calc(50%-4px)] rounded-full bg-peach-muted transition-all duration-300 ease-out ${
-            showFree ? "left-1" : "left-[calc(50%+2px)]"
-          }`}
+      <div className="relative">
+        <Search
+          size={16}
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-faint"
         />
-        <span
-          className={`relative z-10 flex-1 text-center text-xs font-medium transition-colors ${
-            showFree ? "text-white" : "text-ink-light"
-          }`}
+        <input
+          type="search"
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setExpandedId(null);
+          }}
+          placeholder="Поиск по названию ивента"
+          className="sf-input w-full py-2.5 pl-10 pr-4 text-sm"
+        />
+      </div>
+
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <button
+          onClick={() => {
+            setShowFree((v) => !v);
+            setExpandedId(null);
+          }}
+          className="relative flex h-10 w-full max-w-xs items-center rounded-full bg-stone-100 p-1 sm:max-w-[220px]"
+          aria-label="Бесплатные или платные"
         >
-          Бесплатные
-        </span>
-        <span
-          className={`relative z-10 flex-1 text-center text-xs font-medium transition-colors ${
-            !showFree ? "text-white" : "text-ink-light"
-          }`}
-        >
-          Платные
-        </span>
-      </button>
+          <span
+            className={`absolute h-8 w-[calc(50%-4px)] rounded-full bg-peach-muted transition-all duration-300 ease-out ${
+              showFree ? "left-1" : "left-[calc(50%+2px)]"
+            }`}
+          />
+          <span
+            className={`relative z-10 flex-1 text-center text-xs font-medium transition-colors ${
+              showFree ? "text-white" : "text-ink-light"
+            }`}
+          >
+            Бесплатные
+          </span>
+          <span
+            className={`relative z-10 flex-1 text-center text-xs font-medium transition-colors ${
+              !showFree ? "text-white" : "text-ink-light"
+            }`}
+          >
+            Платные
+          </span>
+        </button>
+
+        <div ref={sortRef} className="relative w-full sm:w-auto">
+          <button
+            type="button"
+            onClick={() => {
+              setSortOpen((open) => {
+                const next = !open;
+                if (next && sortMode === "type") setTypeExpanded(true);
+                if (!next) setTypeExpanded(false);
+                return next;
+              });
+            }}
+            className="sf-btn-ghost flex w-full items-center justify-between gap-2 px-4 py-2.5 text-sm sm:min-w-[220px]"
+            aria-expanded={sortOpen}
+            aria-haspopup="listbox"
+          >
+            <span className="inline-flex items-center gap-2">
+              <ArrowDownUp size={16} className="text-peach-muted" />
+              <span className="text-ink-light">Сортировать:</span>
+              <span className="font-medium text-ink">{sortLabel}</span>
+            </span>
+            <ChevronDown
+              size={16}
+              className={`shrink-0 text-ink-faint transition-transform ${
+                sortOpen ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+
+          {sortOpen && (
+            <div className="absolute right-0 z-20 mt-1.5 w-full min-w-[240px] overflow-hidden rounded-xl border border-sand bg-surface shadow-[0_8px_24px_rgb(92_86_80/10%)] sm:w-64">
+              <button
+                type="button"
+                onClick={selectNearest}
+                className={`flex w-full items-center justify-between px-4 py-2.5 text-left text-sm transition-colors hover:bg-peach-soft ${
+                  sortMode === "nearest"
+                    ? "font-medium text-peach-deep"
+                    : "text-ink"
+                }`}
+              >
+                Ближайшие
+                {sortMode === "nearest" && (
+                  <span className="text-xs text-peach-muted">✓</span>
+                )}
+              </button>
+
+              <div className="border-t border-sand">
+                <button
+                  type="button"
+                  onClick={() => setTypeExpanded((v) => !v)}
+                  className={`flex w-full items-center justify-between px-4 py-2.5 text-left text-sm transition-colors hover:bg-peach-soft ${
+                    sortMode === "type"
+                      ? "font-medium text-peach-deep"
+                      : "text-ink"
+                  }`}
+                >
+                  По типу
+                  <ChevronDown
+                    size={14}
+                    className={`text-ink-faint transition-transform ${
+                      typeExpanded ? "rotate-180" : "-rotate-90"
+                    }`}
+                  />
+                </button>
+
+                {typeExpanded && (
+                  <div className="border-t border-sand bg-stone-50/80 py-1">
+                    <button
+                      type="button"
+                      onClick={() => selectType("all")}
+                      className={`flex w-full items-center justify-between px-4 py-2 pl-6 text-left text-sm transition-colors hover:bg-peach-soft ${
+                        sortMode === "type" && eventType === "all"
+                          ? "font-medium text-peach-deep"
+                          : "text-ink-light"
+                      }`}
+                    >
+                      Все типы
+                      {sortMode === "type" && eventType === "all" && (
+                        <span className="text-xs text-peach-muted">✓</span>
+                      )}
+                    </button>
+                    {KG_EVENT_TYPES.map((type) => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => selectType(type)}
+                        className={`flex w-full items-center justify-between px-4 py-2 pl-6 text-left text-sm transition-colors hover:bg-peach-soft ${
+                          sortMode === "type" && eventType === type
+                            ? "font-medium text-peach-deep"
+                            : "text-ink-light"
+                        }`}
+                      >
+                        {EVENT_TYPE_LABELS[type]}
+                        {sortMode === "type" && eventType === type && (
+                          <span className="text-xs text-peach-muted">✓</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       {loading && (
         <div className="flex items-center justify-center gap-2 py-10 text-sm text-ink-light">
@@ -92,7 +285,7 @@ export default function HomePage() {
 
       {!loading && visible.length === 0 && (
         <p className="sf-card px-4 py-8 text-center text-sm text-ink-light">
-          Пока нет {showFree ? "бесплатных" : "платных"} ивентов
+          {emptyMessage}
         </p>
       )}
 
