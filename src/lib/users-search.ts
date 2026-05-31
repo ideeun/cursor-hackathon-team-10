@@ -50,3 +50,18 @@ export async function searchUsersByEmailPrefix(
 export function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }
+
+export async function findUserByEmail(
+  email: string
+): Promise<{ uid: string; name: string } | null> {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) return null;
+  const q = query(
+    collection(db, "users"),
+    where("email", "==", normalized)
+  );
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  const data = snap.docs[0].data();
+  return { uid: snap.docs[0].id, name: data.name ?? normalized.split("@")[0] };
+}

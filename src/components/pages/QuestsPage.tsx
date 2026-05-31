@@ -48,11 +48,11 @@ export default function QuestsPage() {
 
       <div className="sf-card bg-gradient-to-br from-peach-soft to-white p-4 sm:p-5">
         <p className="text-sm font-medium text-ink sm:text-base">
-          🥇 Найди фонтан у ЦУМа → сфоткайся → следующая точка
+          🗺️ Город · 🏃 Спорт с друзьями · 📚 Научиться за месяц
         </p>
         <p className="mt-1 text-xs text-ink-light sm:text-sm">
-          AI генерирует маршрут по вашему району. Соревнуйтесь с друзьями — кто
-          быстрее пройдёт все точки!
+          Добавь друзей в профиле, выбери тип квеста и соревнуйтесь — кто
+          быстрее пройдёт маршрут или освоит навык!
         </p>
       </div>
 

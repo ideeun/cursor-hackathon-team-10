@@ -1,8 +1,13 @@
 "use client";
 
-import { MapPin, Trophy, Users } from "lucide-react";
+import { MapPin, Trophy, Users, Clock } from "lucide-react";
 import type { QuestDoc } from "@/lib/types";
 import QuestMapPreview from "@/components/quests/QuestMapPreview";
+import {
+  formatDaysLeft,
+  getQuestTypeEmoji,
+  getQuestTypeLabel,
+} from "@/lib/quest-templates";
 
 interface QuestCardProps {
   quest: { id: string } & QuestDoc;
@@ -47,8 +52,29 @@ export default function QuestCard({ quest, uid, onClick }: QuestCardProps) {
       className="sf-card sf-card-hover group w-full cursor-pointer overflow-hidden text-left transition-transform duration-200 hover:scale-[1.01]"
     >
       <div className="relative h-44 w-full overflow-hidden bg-stone-100 sm:h-52">
-        <QuestMapPreview checkpoints={quest.checkpoints} className="h-44 sm:h-52" />
-        <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-black/45 to-transparent px-4 py-3">
+        {quest.questType === "monthly" ? (
+          <div className="flex h-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-sky-50 via-peach-soft/30 to-white px-4">
+            <span className="text-4xl">
+              {quest.emoji ?? getQuestTypeEmoji("monthly")}
+            </span>
+            <p className="text-center text-sm font-medium text-ink">
+              {quest.skill ?? "Месячный квест"}
+            </p>
+            {quest.endsAt && (
+              <p className="flex items-center gap-1 text-xs text-peach-deep">
+                <Clock size={12} />
+                {formatDaysLeft(quest.endsAt)} дней · 4 недели
+              </p>
+            )}
+          </div>
+        ) : (
+          <QuestMapPreview checkpoints={quest.checkpoints} className="h-44 sm:h-52" />
+        )}
+        <div className="absolute inset-x-0 top-0 flex items-start justify-between bg-gradient-to-b from-black/45 to-transparent px-4 py-3">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-semibold text-ink backdrop-blur-sm">
+            {quest.emoji ?? getQuestTypeEmoji(quest.questType ?? "city")}{" "}
+            {getQuestTypeLabel(quest.questType ?? "city")}
+          </span>
           <span
             className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold backdrop-blur-sm ${status.className}`}
           >
@@ -74,7 +100,11 @@ export default function QuestCard({ quest, uid, onClick }: QuestCardProps) {
           </h3>
           <p className="mt-1 flex items-center gap-1.5 text-sm text-ink-light">
             <MapPin size={14} className="shrink-0 text-peach-muted" />
-            {quest.district} · {total} точек маршрута
+            {quest.sport
+              ? quest.sport
+              : quest.skill
+                ? quest.skill
+                : `${quest.district} · ${total} точек`}
           </p>
         </div>
 

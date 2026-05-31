@@ -22,6 +22,11 @@ import {
 } from "@/lib/quests-firestore";
 import { getCurrentPosition, isWithinRadius } from "@/lib/geo";
 import { addXp } from "@/lib/firestore";
+import {
+  formatDaysLeft,
+  getQuestTypeEmoji,
+  getQuestTypeLabel,
+} from "@/lib/quest-templates";
 import type { QuestDoc } from "@/lib/types";
 import QuestMap from "./QuestMap";
 import FriendEmailPicker from "./FriendEmailPicker";
@@ -63,6 +68,9 @@ export default function QuestActiveView({ questId }: QuestActiveViewProps) {
   const progress = quest?.participantProgress[uid];
   const currentIdx = progress?.currentCheckpoint ?? 0;
   const currentCheckpoint = quest?.checkpoints[currentIdx];
+  const needsLocation =
+    quest?.questType !== "monthly" &&
+    currentCheckpoint?.requiresLocation !== false;
   const isFinished =
     progress?.finishedAt != null ||
     currentIdx >= (quest?.checkpoints.length ?? 0);
@@ -98,11 +106,11 @@ export default function QuestActiveView({ questId }: QuestActiveViewProps) {
   }, [currentCheckpoint]);
 
   useEffect(() => {
-    setAtLocation(false);
+    setAtLocation(!needsLocation);
     setPhotoFile(null);
     setPhotoPreview(null);
     setError(null);
-  }, [currentIdx]);
+  }, [currentIdx, needsLocation]);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -113,7 +121,7 @@ export default function QuestActiveView({ questId }: QuestActiveViewProps) {
 
   const handleSubmitCheckpoint = async () => {
     if (!quest || !currentCheckpoint || !photoFile) return;
-    if (!atLocation) {
+    if (!atLocation && needsLocation) {
       setError("Сначала подтвердите, что вы на месте.");
       return;
     }
@@ -203,9 +211,29 @@ export default function QuestActiveView({ questId }: QuestActiveViewProps) {
       <div className="sf-card p-4">
         <div className="flex items-start justify-between gap-2">
           <div>
+            <div className="mb-1 flex flex-wrap items-center gap-2">
+              <span className="text-xl">
+                {quest.emoji ?? getQuestTypeEmoji(quest.questType ?? "city")}
+              </span>
+              <span className="sf-badge px-2 py-0.5 text-[10px]">
+                {getQuestTypeLabel(quest.questType ?? "city")}
+              </span>
+              {quest.endsAt && (
+                <span className="flex items-center gap-1 text-[10px] text-ink-light">
+                  <Clock size={11} />
+                  {formatDaysLeft(quest.endsAt)} дн. осталось
+                </span>
+              )}
+            </div>
             <h2 className="text-base font-semibold text-ink">{quest.title}</h2>
             <p className="mt-0.5 text-xs text-ink-light">
-              {quest.district} · {quest.checkpoints.length} точек
+              {quest.sport
+                ? `🏃 ${quest.sport}`
+                : quest.skill
+                  ? `📚 ${quest.skill}`
+                  : quest.district}{" "}
+              · {quest.checkpoints.length}{" "}
+              {quest.questType === "monthly" ? "недель" : "точек"}
             </p>
           </div>
           <span className="sf-badge shrink-0 px-2 py-0.5 text-[10px]">
@@ -248,7 +276,8 @@ export default function QuestActiveView({ questId }: QuestActiveViewProps) {
           <div className="sf-card overflow-hidden p-0">
             <div className="border-b border-sand px-4 py-3">
               <p className="text-[10px] font-medium uppercase tracking-wider text-peach-deep">
-                Точка {currentIdx + 1} из {quest.checkpoints.length}
+                {currentCheckpoint.weekLabel ??
+                  `Точка ${currentIdx + 1} из ${quest.checkpoints.length}`}
               </p>
               <h3 className="mt-1 font-medium text-ink">
                 {currentCheckpoint.title}
@@ -260,41 +289,53 @@ export default function QuestActiveView({ questId }: QuestActiveViewProps) {
                 💡 {currentCheckpoint.hint}
               </p>
             </div>
-            <QuestMap
-              lat={currentCheckpoint.lat}
-              lng={currentCheckpoint.lng}
-              userLat={userLat}
-              userLng={userLng}
-              radiusMeters={currentCheckpoint.radiusMeters}
-              className="h-52 w-full"
-            />
-          </div>
-
-          <div className="flex gap-2">
-            <button
-              onClick={refreshLocation}
-              disabled={locLoading}
-              className="sf-btn-soft flex flex-1 items-center justify-center gap-2 py-3 text-sm disabled:opacity-70"
-            >
-              {locLoading ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <Navigation size={16} />
-              )}
-              Проверить локацию
-            </button>
-            {atLocation && (
-              <span className="flex items-center gap-1 rounded-xl bg-emerald-50 px-3 text-xs font-medium text-emerald-700">
-                <CheckCircle2 size={14} />
-                На месте!
-              </span>
+            {needsLocation ? (
+              <QuestMap
+                lat={currentCheckpoint.lat}
+                lng={currentCheckpoint.lng}
+                userLat={userLat}
+                userLng={userLng}
+                radiusMeters={currentCheckpoint.radiusMeters}
+                className="h-52 w-full"
+              />
+            ) : (
+              <div className="flex h-36 items-center justify-center bg-gradient-to-br from-sky-50 to-peach-soft/40 px-4 text-center">
+                <p className="text-sm text-ink-light">
+                  📸 Сделайте фото прогресса — GPS не нужен
+                </p>
+              </div>
             )}
           </div>
+
+          {needsLocation && (
+            <div className="flex gap-2">
+              <button
+                onClick={refreshLocation}
+                disabled={locLoading}
+                className="sf-btn-soft flex flex-1 items-center justify-center gap-2 py-3 text-sm disabled:opacity-70"
+              >
+                {locLoading ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <Navigation size={16} />
+                )}
+                Проверить локацию
+              </button>
+              {atLocation && (
+                <span className="flex items-center gap-1 rounded-xl bg-emerald-50 px-3 text-xs font-medium text-emerald-700">
+                  <CheckCircle2 size={14} />
+                  На месте!
+                </span>
+              )}
+            </div>
+          )}
 
           <div className="sf-card p-4">
             <label className="mb-2 flex items-center gap-2 text-sm font-medium text-ink">
               <Camera size={16} className="text-peach-muted" />
-              Сфотографируйся на точке
+              {needsLocation
+                ? "Сфотографируйся на точке"
+                : "Загрузите фото прогресса"}
             </label>
             <input
               type="file"
@@ -313,13 +354,13 @@ export default function QuestActiveView({ questId }: QuestActiveViewProps) {
             )}
             <button
               onClick={handleSubmitCheckpoint}
-              disabled={submitting || !photoFile || !atLocation}
+              disabled={submitting || !photoFile || (needsLocation && !atLocation)}
               className="sf-btn-primary mt-3 w-full py-3 text-sm disabled:opacity-50"
             >
               {submitting ? (
                 <Loader2 size={18} className="mx-auto animate-spin" />
               ) : (
-                "✅ Подтвердить точку → следующая"
+                `✅ ${quest.questType === "monthly" ? "Завершить неделю" : "Подтвердить точку"} → дальше`
               )}
             </button>
           </div>

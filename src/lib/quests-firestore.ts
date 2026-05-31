@@ -7,16 +7,17 @@ import {
   getDoc,
   query,
   where,
-  getDocs,
   arrayUnion,
   type Unsubscribe,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "./firebase";
+import { findUserByEmail } from "./users-search";
 import type {
   QuestDoc,
   QuestParticipantProgress,
   QuestCheckpoint,
+  QuestType,
 } from "./types";
 
 export function subscribeMyQuests(
@@ -53,34 +54,35 @@ export function subscribeQuest(
   });
 }
 
-export async function findUserByEmail(
-  email: string
-): Promise<{ uid: string; name: string } | null> {
-  const normalized = email.trim().toLowerCase();
-  if (!normalized) return null;
-  const q = query(
-    collection(db, "users"),
-    where("email", "==", normalized)
-  );
-  const snap = await getDocs(q);
-  if (snap.empty) return null;
-  const data = snap.docs[0].data();
-  return { uid: snap.docs[0].id, name: data.name ?? normalized.split("@")[0] };
-}
-
 export async function createQuest(params: {
   title: string;
   district: string;
+  questType: QuestType;
+  sport?: string;
+  skill?: string;
+  emoji?: string;
+  endsAt?: string;
   checkpoints: QuestCheckpoint[];
   creatorId: string;
   creatorName: string;
   invitedEmails: string[];
+  friendUids?: string[];
 }): Promise<string> {
   const participants = [params.creatorId];
   const participantNames: Record<string, string> = {
     [params.creatorId]: params.creatorName,
   };
   const notFoundEmails: string[] = [];
+
+  for (const fid of params.friendUids ?? []) {
+    if (fid === params.creatorId || participants.includes(fid)) continue;
+    const fs = await getDoc(doc(db, "users", fid));
+    if (fs.exists()) {
+      const name = (fs.data().name as string) ?? "Друг";
+      participants.push(fid);
+      participantNames[fid] = name;
+    }
+  }
 
   for (const email of params.invitedEmails) {
     const friend = await findUserByEmail(email);
@@ -108,6 +110,11 @@ export async function createQuest(params: {
     creatorId: params.creatorId,
     creatorName: params.creatorName,
     district: params.district,
+    questType: params.questType,
+    sport: params.sport,
+    skill: params.skill,
+    emoji: params.emoji,
+    endsAt: params.endsAt,
     status: participants.length > 1 ? "active" : "waiting",
     participants,
     participantNames,

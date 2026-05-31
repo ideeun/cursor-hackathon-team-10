@@ -1,22 +1,27 @@
 import { NextResponse } from "next/server";
 import { getFallbackQuest } from "@/lib/bishkek-quests";
-import type { QuestCheckpoint } from "@/lib/types";
+import {
+  getMonthlyFallbackQuest,
+  getSportFallbackQuest,
+} from "@/lib/quest-templates";
+import type { QuestCheckpoint, QuestType } from "@/lib/types";
 
 interface GenerateBody {
   district?: string;
+  questType?: QuestType;
+  sport?: string;
+  skill?: string;
 }
 
-function parseCheckpoints(raw: unknown): QuestCheckpoint[] | null {
+function parseCheckpoints(
+  raw: unknown,
+  requiresLocation = true
+): QuestCheckpoint[] | null {
   if (!Array.isArray(raw)) return null;
   const checkpoints: QuestCheckpoint[] = [];
   for (let i = 0; i < raw.length; i++) {
     const item = raw[i] as Record<string, unknown>;
-    if (
-      typeof item.title !== "string" ||
-      typeof item.description !== "string" ||
-      typeof item.lat !== "number" ||
-      typeof item.lng !== "number"
-    ) {
+    if (typeof item.title !== "string" || typeof item.description !== "string") {
       return null;
     }
     checkpoints.push({
@@ -24,40 +29,60 @@ function parseCheckpoints(raw: unknown): QuestCheckpoint[] | null {
       title: item.title,
       description: item.description,
       hint: typeof item.hint === "string" ? item.hint : item.description,
-      lat: item.lat,
-      lng: item.lng,
+      lat: typeof item.lat === "number" ? item.lat : 42.8746,
+      lng: typeof item.lng === "number" ? item.lng : 74.6034,
       radiusMeters:
         typeof item.radiusMeters === "number" ? item.radiusMeters : 120,
+      requiresLocation:
+        typeof item.requiresLocation === "boolean"
+          ? item.requiresLocation
+          : requiresLocation,
+      weekLabel: typeof item.weekLabel === "string" ? item.weekLabel : undefined,
     });
   }
   return checkpoints.length >= 3 ? checkpoints : null;
 }
 
 async function generateWithGemini(
-  district: string
-): Promise<{ title: string; checkpoints: QuestCheckpoint[] } | null> {
-  const apiKey = process.env.GEMINI_API_KEY;
+  body: GenerateBody
+): Promise<{
+  title: string;
+  checkpoints: QuestCheckpoint[];
+  emoji?: string;
+  sport?: string;
+  skill?: string;
+  endsAt?: string;
+} | null> {
+  const apiKey = process.env.GEMINI_API_KEY?.replace(/^["']|["']$/g, "");
   if (!apiKey) return null;
 
   const model = process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
+  const questType = body.questType ?? "city";
+  const district = body.district?.trim() || "Центр";
 
-  const prompt = `Сгенерируй городской квест по реальным местам Бишкека, район "${district}".
-Верни ТОЛЬКО валидный JSON без markdown:
-{
-  "title": "название квеста на русском",
-  "checkpoints": [
-    {
-      "title": "краткое название точки",
-      "description": "задание для игрока",
-      "hint": "подсказка где искать",
-      "lat": 42.87,
-      "lng": 74.60,
-      "radiusMeters": 120
-    }
-  ]
-}
-Нужно 4 точки с реальными координатами внутри Бишкека (lat ~42.82-42.90, lng ~74.55-74.70).
-Примеры: ЦУМ, Ош базар, площадь Ала-Тоо, парк Панфилова, Ala-Archa канал, мосты, парки.`;
+  let prompt = "";
+
+  if (questType === "sport") {
+    const sport = body.sport ?? "football";
+    prompt = `Сгенерируй СПОРТИВНЫЙ квест для друзей в Бишкеке, вид спорта: "${sport}".
+4 точки — реальные спортплощадки/парки Бишкека с координатами.
+Задания командные: матчи, тренировки, фото команды.
+JSON:
+{"title":"...","emoji":"⚽","sport":"название","checkpoints":[{"title":"...","description":"...","hint":"...","lat":42.87,"lng":74.60,"radiusMeters":120}]}`;
+  } else if (questType === "monthly") {
+    const skill = body.skill ?? "guitar";
+    prompt = `Сгенерируй МЕСЯЧНЫЙ квест обучения навыку "${skill}" на 30 дней с друзьями.
+4 недели — 4 этапа (weekLabel: "Неделя 1" и т.д.).
+requiresLocation: false для всех точек (учатся дома/онлайн).
+Задания: практика, фото прогресса, занятие с другом, финальный результат.
+JSON:
+{"title":"...","emoji":"🎸","skill":"название навыка","checkpoints":[{"weekLabel":"Неделя 1","title":"...","description":"...","hint":"...","lat":42.87,"lng":74.60,"radiusMeters":500,"requiresLocation":false}]}`;
+  } else {
+    prompt = `Сгенерируй городской квест по реальным местам Бишкека, район "${district}".
+4 точки с координатами (lat ~42.82-42.90, lng ~74.55-74.70).
+JSON:
+{"title":"...","emoji":"🗺️","checkpoints":[{"title":"...","description":"...","hint":"...","lat":42.87,"lng":74.60,"radiusMeters":120}]}`;
+  }
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
@@ -82,13 +107,27 @@ async function generateWithGemini(
   try {
     const parsed = JSON.parse(content) as {
       title?: string;
+      emoji?: string;
+      sport?: string;
+      skill?: string;
       checkpoints?: unknown;
     };
-    const checkpoints = parseCheckpoints(parsed.checkpoints);
+    const requiresLocation = questType !== "monthly";
+    const checkpoints = parseCheckpoints(parsed.checkpoints, requiresLocation);
     if (!checkpoints) return null;
+
+    const endsAt =
+      questType === "monthly"
+        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        : undefined;
+
     return {
-      title: parsed.title ?? `Квест: ${district}`,
+      title: parsed.title ?? "Новый квест",
       checkpoints,
+      emoji: parsed.emoji,
+      sport: parsed.sport ?? body.sport,
+      skill: parsed.skill ?? body.skill,
+      endsAt,
     };
   } catch {
     return null;
@@ -98,17 +137,27 @@ async function generateWithGemini(
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as GenerateBody;
+    const questType = body.questType ?? "city";
     const district = body.district?.trim() || "Центр";
 
-    const aiResult = await generateWithGemini(district);
+    const aiResult = await generateWithGemini(body);
     if (aiResult) {
-      return NextResponse.json({ ...aiResult, source: "gemini" });
+      return NextResponse.json({ ...aiResult, questType, source: "gemini" });
+    }
+
+    if (questType === "sport") {
+      const fallback = getSportFallbackQuest(body.sport ?? "football");
+      return NextResponse.json({ ...fallback, questType, source: "fallback" });
+    }
+    if (questType === "monthly") {
+      const fallback = getMonthlyFallbackQuest(body.skill ?? "guitar");
+      return NextResponse.json({ ...fallback, questType, source: "fallback" });
     }
 
     const fallback = getFallbackQuest(district);
-    return NextResponse.json({ ...fallback, source: "fallback" });
+    return NextResponse.json({ ...fallback, questType: "city", source: "fallback" });
   } catch {
     const fallback = getFallbackQuest("Центр");
-    return NextResponse.json({ ...fallback, source: "fallback" });
+    return NextResponse.json({ ...fallback, questType: "city", source: "fallback" });
   }
 }

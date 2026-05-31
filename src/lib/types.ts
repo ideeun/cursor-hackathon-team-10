@@ -15,7 +15,21 @@ export interface UserProfile {
   level: number;
   xp: number;
   avatar_url?: string;
+  friends?: string[];
 }
+
+export interface FriendRequestDoc {
+  fromUid: string;
+  fromName: string;
+  fromEmail?: string;
+  toUid: string;
+  toName: string;
+  toEmail?: string;
+  status: "pending" | "accepted" | "rejected";
+  createdAt: string;
+}
+
+export type QuestType = "city" | "sport" | "monthly";
 
 export interface QuestCheckpoint {
   order: number;
@@ -25,6 +39,8 @@ export interface QuestCheckpoint {
   lat: number;
   lng: number;
   radiusMeters: number;
+  requiresLocation?: boolean;
+  weekLabel?: string;
 }
 
 export interface QuestParticipantProgress {
@@ -40,6 +56,11 @@ export interface QuestDoc {
   creatorId: string;
   creatorName: string;
   district: string;
+  questType: QuestType;
+  sport?: string;
+  skill?: string;
+  emoji?: string;
+  endsAt?: string;
   status: "waiting" | "active" | "completed";
   participants: string[];
   participantNames: Record<string, string>;

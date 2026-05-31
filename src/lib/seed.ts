@@ -159,6 +159,7 @@ export async function ensureUserProfile(
       uid,
       name,
       email: email?.toLowerCase() ?? "",
+      friends: [],
       level: 1,
       xp: 0,
       avatar_url: avatarUrl ?? "",
