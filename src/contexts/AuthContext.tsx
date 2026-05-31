@@ -46,11 +46,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubAuth = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubAuth = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       if (!firebaseUser) {
         setProfile(null);
         setLoading(false);
+      } else {
+        setLoading(true);
       }
     });
     return unsubAuth;
@@ -60,23 +62,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!user) return;
 
     let unsubProfile: (() => void) | undefined;
+    let cancelled = false;
 
     (async () => {
-      const name =
-        user.displayName ||
-        user.email?.split("@")[0] ||
-        `Гость_${user.uid.slice(0, 4)}`;
-      await ensureUserProfile(user.uid, name, user.photoURL ?? undefined);
+      try {
+        const name =
+          user.displayName ||
+          user.email?.split("@")[0] ||
+          `Гость_${user.uid.slice(0, 4)}`;
+        await ensureUserProfile(user.uid, name, user.photoURL ?? undefined);
+        if (cancelled) return;
 
-      unsubProfile = onSnapshot(doc(db, "users", user.uid), (snap) => {
-        if (snap.exists()) {
-          setProfile(snap.data() as UserProfile);
-        }
-        setLoading(false);
-      });
+        unsubProfile = onSnapshot(
+          doc(db, "users", user.uid),
+          (snap) => {
+            if (snap.exists()) {
+              setProfile(snap.data() as UserProfile);
+            }
+            setLoading(false);
+          },
+          () => {
+            setLoading(false);
+          }
+        );
+      } catch {
+        if (!cancelled) setLoading(false);
+      }
     })();
 
-    return () => unsubProfile?.();
+    return () => {
+      cancelled = true;
+      unsubProfile?.();
+    };
   }, [user]);
 
   const signInWithGoogle = async () => {
