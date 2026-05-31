@@ -29,11 +29,11 @@ export default function ChallengesPage() {
         </p>
       )}
 
-      <div className="flex gap-3 overflow-x-auto pb-2 snap-x [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-2 lg:gap-4 lg:overflow-visible lg:pb-0 xl:grid-cols-3">
+      <div className="-mx-4 flex flex-nowrap gap-3 overflow-x-auto px-4 pb-2 snap-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:mx-0 lg:grid lg:grid-cols-2 lg:gap-4 lg:overflow-visible lg:px-0 lg:pb-0 xl:grid-cols-3">
         {challenges.map((challenge) => (
           <div
             key={challenge.id}
-            className="sf-card sf-card-hover w-72 shrink-0 snap-start p-4 lg:w-auto"
+            className="sf-card sf-card-hover w-[78vw] max-w-[288px] shrink-0 snap-start p-4 sm:w-72 lg:w-auto lg:max-w-none"
           >
             <div className="mb-3 flex items-center gap-2">
               <span className="text-2xl">{challenge.emoji}</span>
@@ -41,7 +41,7 @@ export default function ChallengesPage() {
             </div>
 
             {challenge.description && (
-              <p className="mb-3 whitespace-pre-line text-xs leading-relaxed text-ink-light">
+              <p className="mb-3 line-clamp-4 whitespace-pre-line text-xs leading-relaxed text-ink-light lg:line-clamp-none">
                 {challenge.description}
               </p>
             )}

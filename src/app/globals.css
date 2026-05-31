@@ -173,6 +173,8 @@ body {
 
 .snap-x {
   scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
 }
 
 .snap-start {
