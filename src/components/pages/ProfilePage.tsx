@@ -14,7 +14,7 @@ export default function ProfilePage() {
   const avatarLetter = displayName.charAt(0).toUpperCase();
 
   return (
-    <section className="rounded-3xl border border-orange-100 bg-white p-6 text-center shadow-md">
+    <section className="rounded-3xl border border-orange-100 bg-white p-6 text-center shadow-md lg:mx-auto lg:max-w-xl lg:p-10">
       <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-amber-500 text-2xl font-bold text-white">
         {avatarLetter}
       </div>

@@ -2,26 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Trophy, Users, User } from "lucide-react";
-
-const tabs = [
-  { href: "/", label: "Главная", icon: Home },
-  { href: "/challenges", label: "Челленджи", icon: Trophy },
-  { href: "/gatherings", label: "Сборы", icon: Users },
-  { href: "/profile", label: "Профиль", icon: User },
-] as const;
+import { isNavActive, NAV_TABS } from "@/lib/nav-tabs";
 
 export default function BottomNav() {
   const pathname = usePathname();
 
-  const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
-
   return (
-    <nav className="sticky bottom-0 z-40 border-t border-orange-100/80 bg-white/90 backdrop-blur-xl">
+    <nav className="sticky bottom-0 z-40 border-t border-orange-100/80 bg-white/90 backdrop-blur-xl lg:hidden">
       <div className="flex items-center justify-around px-2 py-2">
-        {tabs.map((tab) => {
-          const active = isActive(tab.href);
+        {NAV_TABS.map((tab) => {
+          const active = isNavActive(pathname, tab.href);
           const Icon = tab.icon;
           return (
             <Link

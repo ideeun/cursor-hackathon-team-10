@@ -19,8 +19,8 @@ export default function ChallengeModal() {
   if (!showChallengeModal) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm">
-      <div className="w-full max-w-md animate-in rounded-t-3xl bg-white p-6 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm lg:items-center lg:p-6">
+      <div className="w-full max-w-md animate-in rounded-t-3xl bg-white p-6 shadow-2xl lg:max-w-lg lg:rounded-3xl">
         <div className="mb-5 flex items-center justify-between">
           <h3 className="text-lg font-bold text-stone-800">Новый челлендж 🏃</h3>
           <button

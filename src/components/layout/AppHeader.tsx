@@ -12,7 +12,7 @@ export default function AppHeader() {
   const avatarLetter = displayName.charAt(0).toUpperCase();
 
   return (
-    <header className="sticky top-0 z-30 space-y-3 bg-gradient-to-b from-orange-50/95 to-amber-50/80 px-4 pb-3 pt-6 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 space-y-3 bg-gradient-to-b from-orange-50/95 to-amber-50/80 px-4 pb-3 pt-6 backdrop-blur-xl lg:hidden">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-400 to-amber-500 text-lg font-bold text-white shadow-lg">

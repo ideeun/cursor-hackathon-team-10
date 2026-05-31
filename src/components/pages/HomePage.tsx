@@ -44,19 +44,22 @@ export default function HomePage() {
 
   return (
     <section className="space-y-3">
-      <div>
+      <div className="lg:hidden">
         <h2 className="text-base font-bold text-stone-800">
           Ивенты в Кыргызстане
         </h2>
         <p className="text-xs text-stone-500">Бесплатные и платные</p>
       </div>
+      <p className="hidden text-sm text-stone-500 lg:block">
+        Бесплатные и платные ивенты по всей стране
+      </p>
 
       <button
         onClick={() => {
           setShowFree((v) => !v);
           setExpandedId(null);
         }}
-        className="relative flex h-10 w-full max-w-xs items-center rounded-full bg-gradient-to-r from-emerald-100 to-orange-100 p-1 shadow-inner"
+        className="relative flex h-10 w-full max-w-xs items-center rounded-full bg-gradient-to-r from-emerald-100 to-orange-100 p-1 shadow-inner lg:max-w-sm"
         aria-label="Бесплатные или платные"
       >
         <span
@@ -96,7 +99,7 @@ export default function HomePage() {
       )}
 
       {!loading && (
-        <ul className="space-y-2">
+        <ul className="space-y-2 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0 xl:grid-cols-3">
           {visible.map((event) => {
             const open = expandedId === event.id;
             return (

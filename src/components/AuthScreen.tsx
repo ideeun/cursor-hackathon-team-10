@@ -80,18 +80,25 @@ export default function AuthScreen() {
   };
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center bg-gradient-to-b from-orange-50 via-amber-50/30 to-sky-50 px-6 py-10 shadow-2xl">
-      <div className="mb-8 text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-orange-400 to-amber-500 shadow-xl">
-          <Sun size={32} className="text-white" />
+    <div className="flex min-h-dvh items-center justify-center px-4 py-8 lg:px-8">
+      <div className="mx-auto flex w-full max-w-md flex-col justify-center bg-gradient-to-b from-orange-50 via-amber-50/30 to-sky-50 px-6 py-10 shadow-2xl lg:max-w-5xl lg:flex-row lg:overflow-hidden lg:rounded-3xl lg:border lg:border-orange-100 lg:p-0">
+        <div className="mb-8 text-center lg:mb-0 lg:flex lg:w-[42%] lg:flex-col lg:justify-center lg:bg-gradient-to-br lg:from-orange-500 lg:to-amber-500 lg:px-10 lg:py-14 lg:text-left">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-orange-400 to-amber-500 shadow-xl lg:mx-0 lg:h-20 lg:w-20 lg:bg-white/20">
+            <Sun size={32} className="text-white lg:h-10 lg:w-10" />
+          </div>
+          <h1 className="text-2xl font-black text-stone-800 lg:text-3xl lg:text-white">
+            SummerFlow
+          </h1>
+          <p className="mt-1 text-sm text-stone-500 lg:mt-3 lg:text-base lg:text-orange-50">
+            Лето без скуки — активности, челленджи и сборы
+          </p>
+          <p className="mt-6 hidden text-sm leading-relaxed text-orange-100 lg:block">
+            Ивенты в Кыргызстане, летние челленджи и сборы компании — в одном
+            приложении для телефона и ноутбука.
+          </p>
         </div>
-        <h1 className="text-2xl font-black text-stone-800">SummerFlow</h1>
-        <p className="mt-1 text-sm text-stone-500">
-          Лето без скуки — активности, челленджи и сборы
-        </p>
-      </div>
 
-      <div className="rounded-3xl border border-orange-100 bg-white p-6 shadow-lg">
+        <div className="rounded-3xl border border-orange-100 bg-white p-6 shadow-lg lg:flex-1 lg:rounded-none lg:border-0 lg:shadow-none lg:p-10">
         <div className="mb-5 flex rounded-2xl bg-stone-100 p-1">
           <button
             type="button"
@@ -235,11 +242,12 @@ export default function AuthScreen() {
             Быстрый вход (гость)
           </button>
         </div>
-      </div>
 
-      <p className="mt-6 text-center text-[10px] text-stone-400">
-        Для демо на хакатоне — используйте «Быстрый вход» или Google
-      </p>
+          <p className="mt-6 text-center text-[10px] text-stone-400">
+            Для демо на хакатоне — используйте «Быстрый вход» или Google
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

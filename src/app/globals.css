@@ -17,6 +17,23 @@ body {
   display: none;
 }
 
+@media (min-width: 1024px) {
+  ::-webkit-scrollbar {
+    display: block;
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(249, 115, 22, 0.35);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
 .snap-x {
   scroll-snap-type: x mandatory;
 }

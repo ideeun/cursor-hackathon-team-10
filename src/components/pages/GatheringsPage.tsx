@@ -11,8 +11,8 @@ export default function GatheringsPage() {
 
   return (
     <section className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between lg:justify-end">
+        <div className="flex items-center gap-2 lg:hidden">
           <Users size={18} className="text-sky-500" />
           <h2 className="text-base font-bold text-stone-800">Сборы и встречи</h2>
         </div>
@@ -30,7 +30,7 @@ export default function GatheringsPage() {
         </p>
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0 xl:grid-cols-3">
         {gatherings.map((gathering) => (
           <div
             key={gathering.id}

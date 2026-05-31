@@ -10,8 +10,8 @@ export default function ChallengesPage() {
 
   return (
     <section className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between lg:justify-end">
+        <div className="flex items-center gap-2 lg:hidden">
           <Trophy size={18} className="text-emerald-500" />
           <h2 className="text-base font-bold text-stone-800">
             Летние челленджи
@@ -31,11 +31,11 @@ export default function ChallengesPage() {
         </p>
       )}
 
-      <div className="flex gap-3 overflow-x-auto pb-2 snap-x [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="flex gap-3 overflow-x-auto pb-2 snap-x [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-2 lg:gap-4 lg:overflow-visible lg:pb-0 xl:grid-cols-3">
         {challenges.map((challenge) => (
           <div
             key={challenge.id}
-            className="w-72 shrink-0 snap-start rounded-3xl border border-emerald-100 bg-white p-4 shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+            className="w-72 shrink-0 snap-start rounded-3xl border border-emerald-100 bg-white p-4 shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-lg lg:w-auto"
           >
             <div className="mb-3 flex items-center gap-2">
               <span className="text-2xl">{challenge.emoji}</span>
